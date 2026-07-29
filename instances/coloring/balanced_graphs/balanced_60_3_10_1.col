@@ -1,0 +1,162 @@
+c FILE: balanced_graphs/balanced_60_3_10_1.col
+c
+c DESCRIPTION: Random balanced graph, 60 nodes,
+c              partitions 3
+c              edge probability 0.1
+c
+c G(60,3,0.1) graph
+c number of vertices : 60
+c max number of edges: 1770
+c edge probability   : 0.1
+c
+c           Graph Stats
+c number of vertices  : 60
+c nonisolated vertices: 60
+c number of edges     : 141
+c edge density        : 0.0797
+c max degree          : 11
+c avg degree          : 4.70
+c min degree          : 1
+c
+p col 60 141
+e 1 28
+e 1 30
+e 1 53
+e 2 42
+e 2 46
+e 2 47
+e 2 48
+e 3 28
+e 3 35
+e 3 40
+e 4 28
+e 4 32
+e 4 35
+e 4 46
+e 4 49
+e 4 53
+e 4 58
+e 5 52
+e 5 58
+e 6 37
+e 6 38
+e 6 42
+e 6 43
+e 6 44
+e 6 47
+e 6 50
+e 6 52
+e 6 55
+e 7 21
+e 7 34
+e 7 35
+e 7 38
+e 7 46
+e 8 22
+e 8 31
+e 8 38
+e 8 44
+e 8 57
+e 9 23
+e 9 26
+e 9 35
+e 9 36
+e 9 37
+e 9 41
+e 9 52
+e 9 54
+e 9 56
+e 9 57
+e 10 29
+e 10 38
+e 10 39
+e 10 49
+e 11 23
+e 11 31
+e 11 33
+e 11 54
+e 12 27
+e 12 32
+e 12 38
+e 12 43
+e 13 25
+e 13 37
+e 13 44
+e 13 49
+e 13 55
+e 14 42
+e 14 60
+e 15 39
+e 16 27
+e 16 30
+e 16 43
+e 16 49
+e 16 53
+e 17 21
+e 17 33
+e 17 38
+e 17 41
+e 17 48
+e 18 45
+e 19 28
+e 19 37
+e 19 43
+e 19 46
+e 19 50
+e 19 55
+e 19 56
+e 20 25
+e 20 28
+e 20 31
+e 20 37
+e 20 53
+e 20 57
+e 20 60
+e 22 50
+e 22 52
+e 22 60
+e 23 50
+e 23 52
+e 23 59
+e 24 45
+e 24 57
+e 25 50
+e 25 52
+e 25 55
+e 26 42
+e 26 59
+e 28 41
+e 28 45
+e 29 44
+e 29 47
+e 29 49
+e 29 52
+e 29 59
+e 30 44
+e 30 51
+e 31 42
+e 31 52
+e 31 54
+e 31 60
+e 32 48
+e 34 43
+e 34 48
+e 34 55
+e 35 42
+e 35 51
+e 35 52
+e 35 60
+e 36 46
+e 36 49
+e 37 48
+e 37 52
+e 37 55
+e 38 41
+e 38 42
+e 38 60
+e 39 41
+e 39 48
+e 39 52
+e 39 53
+e 39 59
+e 40 44
