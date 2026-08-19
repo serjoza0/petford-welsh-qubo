@@ -4,66 +4,6 @@ import numpy as np
 
 InitFn = Callable[[CSRGraph, int, np.random.Generator], np.ndarray]
 
-class GraphColoringProblem:
-    def __init__(self, graph: CSRGraph, k: int):
-        self.graph = graph
-        self.n = graph.n
-        self.num_states = k
-        self.k = k
-        self.state = np.empty(self.n, dtype=np.int32)
-
-    def initial_state(self, rng: np.random.Generator, init_fn: InitFn | None = None) -> np.ndarray:
-        state = init_fn(self.graph, self.k, rng) if init_fn else rng.integers(0, self.k, size=self.n)
-        self.state = state
-
-        self.color_count = np.zeros((self.n, self.k), dtype=np.int32)
-        for v in range(self.n):
-            for u in neighbors(self.graph, v):
-                self.color_count[v, state[u]] += 1
-        self.bad_vertices = {v for v in range(self.n) if self.color_count[v, state[v]] > 0}
-        self.best_state = None
-        self.best_value = -np.inf
-        self._update_best()
-        return self.state
-
-    def candidate_vertices(self) -> np.ndarray:
-        return np.fromiter(self.bad_vertices, dtype=np.int32)
-
-    def local_field(self, u: int) -> np.ndarray:
-        return self.color_count[u]
-
-    def apply(self, u: int, new_color: int) -> None:
-        old_color = self.state[u]
-        if new_color == old_color:
-            return
-        self.state[u] = new_color
-        for v in neighbors(self.graph, u):
-            self.color_count[v, old_color] -= 1
-            self.color_count[v, new_color] += 1
-            self._refresh_bad(v)
-        self._refresh_bad(u)
-        self._update_best()
-
-    def _refresh_bad(self, v: int) -> None:
-        if self.color_count[v, self.state[v]] > 0:
-            self.bad_vertices.add(v)
-        else:
-            self.bad_vertices.discard(v)
-
-    def is_feasible(self) -> bool:
-        return len(self.bad_vertices) == 0
-
-    def objective(self) -> float:
-        return -len(self.bad_vertices)
-    
-    def _update_best(self) -> None:
-        if self.is_feasible():
-            value = self.objective()
-            if value > self.best_value:
-                self.best_value = value
-                self.best_state = self.state.copy()
-
-
 class MaxStableSetProblem:
     def __init__(self, graph:CSRGraph, A: float = 1.0, B: float = 2.0) -> None:
         # assert B >= A
