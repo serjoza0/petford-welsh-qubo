@@ -42,7 +42,7 @@ def run_trial(graph: CSRGraph, A: float, B: float, base: int, num_attempts: int,
     for _ in range(num_attempts):
         problem = MaxStableSetProblem(graph, A, B)
         petford_welsh(
-            problem,
+            problem, #type: ignore
             base,
             max_iters,
             rng

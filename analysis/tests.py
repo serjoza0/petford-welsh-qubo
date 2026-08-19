@@ -1,5 +1,9 @@
 import numpy as np
 import networkx as nx
+import os
+
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
 
 from scripts import *
 
@@ -14,7 +18,7 @@ def check_state_consistency(seed=0, n=30, p=0.15, n_steps=800):
     for step in range(n_steps):
         u = int(rng.integers(0, n))
         new_val = int(rng.integers(0,2))
-        problem.apply(state, u, new_val)
+        problem.apply(u, new_val)
 
         true_neighbor_sum = np.array(
             [int(state[list(neighbors(graph, v))].sum()) for v in range(n)]
@@ -31,12 +35,12 @@ def check_state_consistency(seed=0, n=30, p=0.15, n_steps=800):
             break
 
         true_energy = -problem.A * state.sum() + problem.B * 0.5 * np.dot(state, true_neighbor_sum)
-        if abs(problem.energy(state) - true_energy) > 1e-9:
+        if abs(problem.energy() - true_energy) > 1e-9:
             failures.append((step, "energy mismatch"))
             break
 
         true_feasible = len(true_conflicted) == 0
-        if problem.is_feasible(state) != true_feasible:
+        if problem.is_feasible() != true_feasible:
             failures.append("is_feasible mismatch")
             break
 
@@ -79,7 +83,7 @@ def check_optimality(seed=0, sizes=(8,10,12,14), p=0.35, num_attempts=100, max_i
         best_found = 0
         for _ in range(num_attempts):
             problem = MaxStableSetProblem(graph, A=1.0, B=2.0)
-            petford_welsh(problem, b=4.0, max_iters=max_iters, rng=rng, record_every=max_iters)
+            petford_welsh(problem, b=4.0, max_iters=max_iters, rng=rng, record_every=max_iters) #type: ignore
             if problem.best_state is not None:
                 best_found = max(best_found, int(problem.best_state.sum()))
 

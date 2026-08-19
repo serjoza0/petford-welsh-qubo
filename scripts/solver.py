@@ -6,12 +6,14 @@ from .graph import CSRGraph
 class Problem(Protocol):
     n: int
     num_states: int
+    state: np.ndarray
     best_state: np.ndarray | None
+    best_value: float
     graph: "CSRGraph"
     def initial_state(self, rng: np.random.Generator, init_fn: InitFn | None = None) -> np.ndarray: ...
-    def candidate_vertices(self, state: np.ndarray) -> np.ndarray: ...
-    def local_field(self, state: np.ndarray, u: int) -> np.ndarray: ...
-    def apply(self, state: np.ndarray, u: int, new_val: int) -> None: ...
+    def candidate_vertices(self) -> np.ndarray: ...
+    def local_field(self, u: int) -> np.ndarray: ...
+    def apply(self, u: int, new_val: int) -> None: ...
     # def objective(self, state: np.ndarray) -> float: ...
 
 
@@ -32,28 +34,26 @@ def petford_welsh(
         max_iters: int = 1000,
         rng: np.random.Generator | None = None,
         init_fn: InitFn | None = None,
-        record_every: int = 1
+        record_every: int = 1,
+        target: float | None = None
 ):
     rng = rng or np.random.default_rng()
-    state = problem.initial_state(rng, init_fn=init_fn)
-    # print(f"Initial state: {state}")
+    problem.initial_state(rng, init_fn=init_fn)
     history: List[np.ndarray] = []
 
     for it in range(max_iters):
-        candidates = problem.candidate_vertices(state)
-        # print(f"Iteration {it}: candidates = {candidates}, state = {state}")
+        candidates = problem.candidate_vertices()
         if len(candidates) == 0:
             print(f"No candidates left at iteration {it}, terminating early.")
             break
 
         u = rng.choice(candidates)
-        field = problem.local_field(state, u)
+        field = problem.local_field(u)
         new_val = boltzmann_choice(field, b, rng)
-        # print(f"Selected vertex {u}, with value {state[u]}, field = {field}, new value = {new_val}")
-        problem.apply(state, u, new_val)
+        problem.apply(u, new_val)
         if it % record_every == 0:
-            # print(f"Recording state at iteration {it}: {state}")
-            history.append(state.copy())
+            history.append(problem.best_state.copy() if problem.best_state is not None else problem.state.copy())
+        if target is not None and problem.best_value >= target:
+            break
 
-    # print(f"History: {history}")
-    return state, history
+    return problem.state, history

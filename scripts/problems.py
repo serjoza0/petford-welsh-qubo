@@ -10,9 +10,11 @@ class GraphColoringProblem:
         self.n = graph.n
         self.num_states = k
         self.k = k
+        self.state = np.empty(self.n, dtype=np.int32)
 
     def initial_state(self, rng: np.random.Generator, init_fn: InitFn | None = None) -> np.ndarray:
         state = init_fn(self.graph, self.k, rng) if init_fn else rng.integers(0, self.k, size=self.n)
+        self.state = state
 
         self.color_count = np.zeros((self.n, self.k), dtype=np.int32)
         for v in range(self.n):
@@ -21,45 +23,45 @@ class GraphColoringProblem:
         self.bad_vertices = {v for v in range(self.n) if self.color_count[v, state[v]] > 0}
         self.best_state = None
         self.best_value = -np.inf
-        self._update_best(state)
-        return state
+        self._update_best()
+        return self.state
 
-    def candidate_vertices(self, state: np.ndarray) -> np.ndarray:
+    def candidate_vertices(self) -> np.ndarray:
         return np.fromiter(self.bad_vertices, dtype=np.int32)
 
-    def local_field(self, state: np.ndarray, u: int) -> np.ndarray:
+    def local_field(self, u: int) -> np.ndarray:
         return self.color_count[u]
 
-    def apply(self, state: np.ndarray, u: int, new_color: int) -> None:
-        old_color = state[u]
+    def apply(self, u: int, new_color: int) -> None:
+        old_color = self.state[u]
         if new_color == old_color:
             return
-        state[u] = new_color
+        self.state[u] = new_color
         for v in neighbors(self.graph, u):
             self.color_count[v, old_color] -= 1
             self.color_count[v, new_color] += 1
-            self._refresh_bad(state, v)
-        self._refresh_bad(state, u)
-        self._update_best(state)
+            self._refresh_bad(v)
+        self._refresh_bad(u)
+        self._update_best()
 
-    def _refresh_bad(self, state: np.ndarray, v: int) -> None:
-        if self.color_count[v, state[v]] > 0:
+    def _refresh_bad(self, v: int) -> None:
+        if self.color_count[v, self.state[v]] > 0:
             self.bad_vertices.add(v)
         else:
             self.bad_vertices.discard(v)
 
-    def is_feasible(self, state: np.ndarray) -> bool:
+    def is_feasible(self) -> bool:
         return len(self.bad_vertices) == 0
 
-    def objective(self, state: np.ndarray) -> float:
+    def objective(self) -> float:
         return -len(self.bad_vertices)
     
-    def _update_best(self, state: np.ndarray) -> None:
-        if self.is_feasible(state):
-            value = self.objective(state)
+    def _update_best(self) -> None:
+        if self.is_feasible():
+            value = self.objective()
             if value > self.best_value:
                 self.best_value = value
-                self.best_state = state.copy()
+                self.best_state = self.state.copy()
 
 
 class MaxStableSetProblem:
@@ -71,9 +73,12 @@ class MaxStableSetProblem:
         self.A = A
         self.B = B
         self._all = np.arange(self.n)
+        self.state = np.zeros(self.n, dtype=np.int64)
 
     def initial_state(self, rng: np.random.Generator, init_fn: InitFn | None = None) -> np.ndarray:
         state = init_fn(self.graph, self.num_states, rng) if init_fn else np.zeros(self.n, dtype=np.int64)
+        self.state = state
+
         self.neighbor_sum = np.zeros(self.n, dtype=np.int64)
         for v in range(self.n):
             for u in neighbors(self.graph, v):
@@ -82,14 +87,14 @@ class MaxStableSetProblem:
 
         self.best_state = None
         self.best_value = -np.inf
-        self._update_best(state)
+        self._update_best()
         return state
 
-    def candidate_vertices(self, state: np.ndarray) -> np.ndarray:
+    def candidate_vertices(self) -> np.ndarray:
         return self._all
 
-    def local_field(self, state: np.ndarray, u: int) -> np.ndarray:
-        x_u = state[u]
+    def local_field(self, u: int) -> np.ndarray:
+        x_u = self.state[u]
         s = self.neighbor_sum[u]
         deg = self.graph.offsets[u + 1] - self.graph.offsets[u]
         abs_term = s if x_u == 0 else deg - s
@@ -97,36 +102,60 @@ class MaxStableSetProblem:
         X1 = self.B * s - self.A * (1 - x_u)
         return np.array([X0, X1])
 
-    def apply(self, state: np.ndarray, u: int, new_val: int) -> None:
-        old_val = state[u]
+    def apply(self, u: int, new_val: int) -> None:
+        old_val = self.state[u]
         if new_val == old_val:
             return
-        state[u] = new_val
+        self.state[u] = new_val
         delta = new_val - old_val
         for v in neighbors(self.graph, u):
             self.neighbor_sum[v] += delta
-            self._refresh_conflict(state, v)
-        self._refresh_conflict(state, u)
-        self._update_best(state)
+            self._refresh_conflict(v)
+        self._refresh_conflict(u)
+        self._update_best()
 
-    def energy(self, state: np.ndarray) -> float:
-        return float(-self.A * state.sum() + self.B * 0.5 * np.dot(state, self.neighbor_sum))
+    def energy(self) -> float:
+        return float(-self.A * self.state.sum() + self.B * 0.5 * np.dot(self.state, self.neighbor_sum))
 
-    def _refresh_conflict(self, state: np.ndarray, v: int) -> None:
-        if state[v] == 1 and self.neighbor_sum[v] > 0:
+    def _refresh_conflict(self, v: int) -> None:
+        if self.state[v] == 1 and self.neighbor_sum[v] > 0:
             self.conflicted.add(v)
         else:
             self.conflicted.discard(v)
 
-    def is_feasible(self, state: np.ndarray) -> bool:
+    def is_feasible(self) -> bool:
         return len(self.conflicted) == 0
 
-    def objective(self, state: np.ndarray) -> float:
-        return int(state.sum())
+    def objective(self) -> float:
+        return int(self.state.sum())
 
-    def _update_best(self, state: np.ndarray) -> None:
-        if self.is_feasible(state):
-            value = self.objective(state)
+    def _update_best(self) -> None:
+        if self.is_feasible():
+            value = self.objective()
             if value > self.best_value:
                 self.best_value = value
-                self.best_state = state.copy()
+                self.best_state = self.state.copy()
+
+    def convert_to_feasible(self) -> np.ndarray:
+        state = self.state.copy()
+        graph = self.graph
+        n = graph.n
+
+        neighbor_sum = np.zeros(n, dtype=np.int64)
+        for v in range(n):
+            if state[v]:
+                neighbor_sum[v] = int(state[neighbors(graph, v)].sum())
+
+        conflicted = {v for v in range(n) if state[v] == 1 and neighbor_sum[v] > 0}
+
+        while conflicted:
+            v = max(conflicted, key=lambda x: neighbor_sum[x])
+            state[v] = 0
+            conflicted.discard(v)
+            for u in neighbors(graph, v):
+                if state[u] == 1:
+                    neighbor_sum[u] -= 1
+                    if neighbor_sum[u] == 0:
+                        conflicted.discard(u)
+
+        return state

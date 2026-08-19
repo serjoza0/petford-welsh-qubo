@@ -53,10 +53,10 @@ KNOWN_ALPHA = {
 
 BUCKETS = [
     # (max_n_inclusive, label, max_iters, num_attempts)
-    (130, "small", 3000, 50),
+    (130, "small", 3000, 30),
     (250, "medium", 5000, 30),
-    (600, "large", 10000, 15),
-    (float("inf"), "xlarge", 20000, 8),
+    (600, "large", 10000, 30),
+    (float("inf"), "xlarge", 20000, 30),
 ]
 
 QUICK_BUCKETS = [
@@ -107,17 +107,22 @@ def main():
 
         print(f"[{label:6s}] {name:35s} n={graph.n:5d} m={graph.m:7d} "
               f"(A={args.A}, B={args.B}, base={args.base}, "
-              f"max_iters={max_iters}, attempts={num_attempts}) ... ", end="", flush=True)
+              f"max_iters={max_iters}, attempts={num_attempts}) ... ", end="\n", flush=True)
         
         t0 = time.perf_counter()
         sizes = []
-        for _ in range(num_attempts):
+        target = KNOWN_ALPHA.get(name)
+        for i in range(num_attempts):
             problem = MaxStableSetProblem(graph, A=args.A, B=args.B)
-            petford_welsh(problem, b=args.base, max_iters=max_iters, rng=rng, record_every=max_iters)
+            petford_welsh(problem, b=args.base, max_iters=max_iters, rng=rng, record_every=max_iters, target=target) #type: ignore
+            print(f" {i+1}/{num_attempts} done", end="\r", flush=True)
             if problem.best_state is not None:
                 sizes.append(int(problem.best_state.sum()))
             else:
                 sizes.append(0)
+
+            if target is not None and problem.best_value >= target:
+                break
         elapsed = time.perf_counter() - t0
 
         best, mean, std = max(sizes), float(np.mean(sizes)), float(np.std(sizes))
