@@ -1,11 +1,11 @@
 import os
 import sys
-import time
-import numpy as np
 import glob
+import argparse
+import time
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
-from scripts import CSRGraph, MaxStableSetProblem, petford_welsh, read_edge_list, create_networkx_graph
+from scripts import *
 
 from dwave.samplers import SimulatedAnnealingSampler
 from qpu_comparison import calculate_best_solution, eliminate_and_recalculate
@@ -26,35 +26,12 @@ KNOWN_ALPHA = {
     "san200-0-7-1": 30, "san200-0-7-2": 18, "sanr200-0-7": 18,
 }
 
-
-
-NUM_RESTARTS = 20        # your PW attempts, and SA's num_reads
-PW_MAX_ITERS = 5000
-SA_BETA = 0.5             # the paper's own recommended penalty value
-SA_POST_RUNS = 100        # matches the paper's S_post budget
+SOLVER = "jit"
+NUM_RESTARTS = 2000
+PW_MAX_ITERS = 50
+SA_BETA = 0.5
+SA_POST_RUNS = 100
 SEED = 7
-
-base_dir = os.getcwd()
-inst_dir = os.path.join(base_dir, "instances", "stable_set")
-paths = sorted(glob.glob(os.path.join(inst_dir, "*.txt")))
-
-INSTANCES = {os.path.splitext(os.path.basename(path))[0].replace("_stable_set_edge_list", ""): path for path in paths}
-
-
-def run_petford_welsh(graph: CSRGraph, num_restarts: int, max_iters: int, rng: np.random.Generator):
-    t0 = time.perf_counter()
-    best = 0
-    for _ in range(num_restarts):
-        problem = MaxStableSetProblem(graph, A=1.0, B=2.0)
-        target = KNOWN_ALPHA.get(graph.name)
-        petford_welsh(problem, b=4.0, max_iters=max_iters, rng=rng, record_every=max_iters, target=target) #type: ignore
-        if problem.best_state is not None:
-            best = max(best, int(problem.best_state.sum()))
-        if target is not None and problem.best_value >= target:
-            break
-
-    elapsed = time.perf_counter() - t0
-    return best, elapsed
 
 
 def run_reference_sa(nx_graph, num_runs: int, beta: float, post_runs: int):
@@ -80,21 +57,32 @@ def run_reference_sa(nx_graph, num_runs: int, beta: float, post_runs: int):
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--solver", choices=["python", "jit"], default=SOLVER)
+    args = parser.parse_args()
+
     base_dir = os.getcwd()
-    rng = np.random.default_rng(SEED)
+    inst_dir = os.path.join(base_dir, "instances", "stable_set")
+    paths = sorted(glob.glob(os.path.join(inst_dir, "*.txt")))
+    instances = {os.path.splitext(os.path.basename(p))[0].replace("_stable_set_edge_list", ""): p for p in paths}
 
     header = (f"{'instance':24s} {'known':>6s} | {'PW best':>8s} {'PW time':>8s} | "
               f"{'SA best':>8s} {'SA raw':>8s} {'SA post':>8s} {'SA total':>9s}")
     print(header)
     print("-" * len(header))
 
-    for name in INSTANCES:
-        path = os.path.join(base_dir, "instances", "stable_set", f"{name}_stable_set_edge_list.txt")
+    for name, path in instances.items():
         n, edges = read_edge_list(path)
         nx_graph = create_networkx_graph(n, edges)
         csr_graph = CSRGraph.from_edge_list_file(path, name=name)
 
-        pw_best, pw_time = run_petford_welsh(csr_graph, NUM_RESTARTS, PW_MAX_ITERS, rng)
+        pw_result = run_multi_start(
+            csr_graph, solver=args.solver, A=1.0, B=2.0, b=4.0,
+            max_iters=PW_MAX_ITERS, num_attempts=NUM_RESTARTS, seed=SEED,
+            known_alpha=KNOWN_ALPHA.get(name),
+        )
+        pw_best, pw_time = pw_result.best, pw_result.total_time
+
         sa_best, sa_raw_time, sa_post_time = run_reference_sa(nx_graph, NUM_RESTARTS, SA_BETA, SA_POST_RUNS)
         sa_total_time = sa_raw_time + sa_post_time
 

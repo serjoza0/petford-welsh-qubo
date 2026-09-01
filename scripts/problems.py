@@ -1,6 +1,7 @@
 from .graph import CSRGraph, neighbors
 from typing import Callable
 import numpy as np
+import time
 
 InitFn = Callable[[CSRGraph, int, np.random.Generator], np.ndarray]
 
@@ -13,41 +14,47 @@ class MaxStableSetProblem:
         self.A = A
         self.B = B
         self._all = np.arange(self.n)
+        self.degree = np.diff(graph.offsets)
         self.state = np.zeros(self.n, dtype=np.int64)
 
     def initial_state(self, rng: np.random.Generator, init_fn: InitFn | None = None) -> np.ndarray:
         state = init_fn(self.graph, self.num_states, rng) if init_fn else np.zeros(self.n, dtype=np.int64)
         self.state = state
 
-        self.neighbor_sum = np.zeros(self.n, dtype=np.int64)
-        for v in range(self.n):
-            for u in neighbors(self.graph, v):
-                self.neighbor_sum[v] += state[u]
+        src = np.repeat(np.arange(self.n), np.diff(self.graph.offsets))
+        self.neighbor_sum = np.bincount(src, weights=state[self.graph.nbrs], minlength=self.n).astype(np.int64)
         self.conflicted = {v for v in range(self.n) if state[v] == 1 and self.neighbor_sum[v] > 0}
 
-        self.best_state = None
+        self.best_state: np.ndarray = state.copy()
         self.best_value = -np.inf
+        self.best_time = 0.0
+        self.best_step = 0
+        self._step = 0
+        self._set_size = int(state.sum())
+        self._start_time = time.perf_counter()
         self._update_best()
         return state
 
     def candidate_vertices(self) -> np.ndarray:
         return self._all
 
-    def local_field(self, u: int) -> np.ndarray:
-        x_u = self.state[u]
-        s = self.neighbor_sum[u]
-        deg = self.graph.offsets[u + 1] - self.graph.offsets[u]
+    def local_field(self, u: int):
+        x_u = self.state.item(u)
+        s = self.neighbor_sum.item(u)
+        deg = self.degree.item(u)
         abs_term = s if x_u == 0 else deg - s
         X0 = self.A * x_u - self.B * abs_term
         X1 = self.B * s - self.A * (1 - x_u)
-        return np.array([X0, X1])
+        return (X0, X1)
 
     def apply(self, u: int, new_val: int) -> None:
+        self._step += 1
         old_val = self.state[u]
         if new_val == old_val:
             return
         self.state[u] = new_val
         delta = new_val - old_val
+        self._set_size += delta
         for v in neighbors(self.graph, u):
             self.neighbor_sum[v] += delta
             self._refresh_conflict(v)
@@ -67,7 +74,7 @@ class MaxStableSetProblem:
         return len(self.conflicted) == 0
 
     def objective(self) -> float:
-        return int(self.state.sum())
+        return self._set_size
 
     def _update_best(self) -> None:
         if self.is_feasible():
@@ -75,6 +82,8 @@ class MaxStableSetProblem:
             if value > self.best_value:
                 self.best_value = value
                 self.best_state = self.state.copy()
+                self.best_time = time.perf_counter() - self._start_time
+                self.best_step = self._step
 
     def convert_to_feasible(self) -> np.ndarray:
         state = self.state.copy()

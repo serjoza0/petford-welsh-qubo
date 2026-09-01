@@ -9,14 +9,18 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.
 from scripts import *
 
 INSTANCES = {
-    "hamming6_2": "instances/stable_set/hamming6_2_stable_set_edge_list.txt",
-    "hamming6_4": "instances/stable_set/hamming6_4_stable_set_edge_list.txt",
+    # "hamming6_2": "instances/stable_set/hamming6_2_stable_set_edge_list.txt",
+    # "hamming6_4": "instances/stable_set/hamming6_4_stable_set_edge_list.txt",
     # "paley61":    "instances/stable_set/paley61_stable_set_edge_list.txt",
-    "dsjc125.9":  "instances/stable_set/dsjc125.9_stable_set_edge_list.txt",
+    # "dsjc125.9":  "instances/stable_set/dsjc125.9_stable_set_edge_list.txt",
     # "keller4":    "instances/stable_set/keller4_stable_set_edge_list.txt",
     # "MANN_9":     "instances/stable_set/MANN_a9_stable_set_edge_list.txt",
-    "C125.9":     "instances/stable_set/C125.9_stable_set_edge_list.txt",
-    "evil_myc5x24": "instances/stable_set/evil-N120-p98-myc5x24_stable_set_edge_list.txt",
+    # "C125.9":     "instances/stable_set/C125.9_stable_set_edge_list.txt",
+    # "evil_myc5x24": "instances/stable_set/evil-N120-p98-myc5x24_stable_set_edge_list.txt",
+    "brock800_4": "instances/stable_set/brock800_4_stable_set_edge_list.txt",
+    "p_hat1500_3": "instances/stable_set/p_hat1500_3_stable_set_edge_list.txt",
+    "sanr200-0-7": "instances/stable_set/sanr200-0-7_stable_set_edge_list.txt",
+    "c-fat500-5": "instances/stable_set/c-fat500-5_stable_set_edge_list.txt",
 }
 
 TRUE_VALUES = {
@@ -28,27 +32,19 @@ TRUE_VALUES = {
     # "MANN_9": 16,
     "C125.9": 34,
     "evil_myc5x24": 48,
+    "brock800_4": 26,
+    "p_hat1500_3": 94,
+    "sanr200-0-7": 30,
+    "c-fat500-5": 64,
 }
 
+SOLVER = "jit"
 A = 1.0
-B_RATIOS = [1.5, 2, 3, 5, 10, 20]
-BASES = [3, 4, 5, 10, 15, 20]
+B_RATIOS = [1.5, 2, 3, 5, 7, 10, 15, 20]
+BASES = [3, 4, 5, 6, 7, 8, 10, 12, 15, 18, 20]
 NUM_ATTEMPTS = 100
-MAX_ITERS = 3000
+MAX_ITERS = 100000
 SEED = 0
-
-def run_trial(graph: CSRGraph, A: float, B: float, base: int, num_attempts: int, max_iters: int, rng: np.random.Generator):
-    sizes = []
-    for _ in range(num_attempts):
-        problem = MaxStableSetProblem(graph, A, B)
-        petford_welsh(
-            problem, #type: ignore
-            base,
-            max_iters,
-            rng
-        )
-        sizes.append(problem.best_value)
-    return sizes
 
 def main():
     base_dir = os.getcwd()
@@ -63,15 +59,17 @@ def main():
         for ratio in B_RATIOS:
             B = A * ratio
             for base in BASES:
-                sizes = run_trial(graph, A, B, base, NUM_ATTEMPTS, MAX_ITERS, rng)
-                best, mean, std = max(sizes), float(np.mean(sizes)), float(np.std(sizes))
+                result = run_multi_start(
+                    graph, solver=SOLVER, A=A, B=B, b=base,
+                    max_iters=MAX_ITERS, num_attempts=NUM_ATTEMPTS, seed=SEED,
+                )
                 rows.append({
                     "instance": inst_name, "n": graph.n, "m": graph.m,
                     "A": A, "B": B, "ratio": ratio, "base": base,
-                    "best": best, "mean": mean, "std": std,
-                    "sizes": sizes
+                    "best": result.best, "mean": result.mean, "std": result.std,
+                    "sizes": result.sizes
                 })   
-                print(f"  ratio={ratio:>4} base={base:>3}: best={best:3d} mean={mean:6.2f} std={std:5.2f}")
+                print(f"  ratio={ratio:>4} base={base:>3}: best={result.best:3d} mean={result.mean:6.2f} std={result.std:5.2f}")
 
     csv_path = os.path.join(base_dir, "results", "param_sweep_results.csv")
     with open(csv_path, "w", newline="") as f:
