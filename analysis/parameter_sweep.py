@@ -1,7 +1,6 @@
 import numpy as np
-import networkx as nx
 import os
-import csv
+from tqdm import tqdm
 
 from benchmark_common import *
 from scripts import *
@@ -10,17 +9,17 @@ from scripts import *
 
 
 SOLVER = "jit"
-B_RATIOS = [1.5, 2, 3, 5, 7, 10, 15, 20]
-BASES = [3, 4, 5, 6, 7, 8, 10, 12, 15, 18, 20]
+B_RATIOS = [1.5, 2, 3, 5, 7, 10, 15, 20, 30, 50, 100, 200]
+BASES = [3, 4, 5, 6, 7, 8, 10, 12, 15, 18, 20, 25, 30, 40, 50, 75, 100]
 
 def main():
     base_dir = os.getcwd()
     names = all_instance_names(base_dir)
 
     rows = []
-    for name in names:
+    for name in tqdm(names):
         graph = load_instance(name, base_dir)
-        print(f"\n--- {name} (n={graph.n}, m={graph.m}) ---")
+        # print(f"\n--- {name} (n={graph.n}, m={graph.m}) ---")
 
         for ratio in B_RATIOS:
             B = DEFAULT_A * ratio
@@ -35,7 +34,7 @@ def main():
                     "best": result.best, "mean": result.mean, "std": result.std,
                     "sizes": result.sizes
                 })   
-                print(f"  ratio={ratio:>4} base={base:>3}: best={result.best:3d} mean={result.mean:6.2f} std={result.std:5.2f}")
+                # print(f"  ratio={ratio:>4} base={base:>3}: best={result.best:3d} mean={result.mean:6.2f} std={result.std:5.2f}")
 
     csv_path = os.path.join(base_dir, "results", "param_sweep_results.csv")
     write_csv(rows, csv_path)

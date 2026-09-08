@@ -56,7 +56,7 @@ def main():
               f"max_iters={args.max_iters}, attempts={args.num_attempts}) ... ", end="\n", flush=True)
         
         result = run_multi_start(graph, solver="jit", A=args.A, B=args.B, b=args.base,
-                                 max_iters=args.max_iters, num_attempts=args.num_attempts, seed=args.seed,
+                                 max_iters=ITERS_PER_N * graph.n, num_attempts=args.num_attempts, seed=args.seed,
                                  known_alpha=KNOWN_ALPHA.get(name))
         print(f"best={result.best:4d} mean={result.mean:7.2f} std={result.std:5.2f} time={result.total_time:6.1f}s")
         results.append(result)

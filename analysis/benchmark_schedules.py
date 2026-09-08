@@ -28,12 +28,10 @@ def oscillating_schedule(max_iters, b_mid, b_amp, n_cycles):
 
 
 SCHEDULES = {
-    "constant (b=4)":               lambda mi: constant_schedule(mi, 4.0),
+    "constant (b=18)":               lambda mi: constant_schedule(mi, 18.0),
     "linear up (2->50)":            lambda mi: linear_schedule(mi, 2.0, 50.0),
     "linear down (50->2)":          lambda mi: linear_schedule(mi, 50.0, 2.0),
-    "geometric mild (2->20)":       lambda mi: geometric_schedule(mi, 2.0, 20.0),
-    "geometric steep (1.05->200)":  lambda mi: geometric_schedule(mi, 1.05, 200.0),
-    "oscillating (2<->18, 5 cyc)":  lambda mi: oscillating_schedule(mi, 10.0, 8.0, 5),
+    "geometric (2->50)":       lambda mi: geometric_schedule(mi, 2.0, 50.0),
 }
 MAX_ITERS = [5000, 20000, 100000, 500000, 2000000]
 
@@ -70,7 +68,8 @@ def main():
             avg_time = float(np.mean([a.elapsed for a in result.attempts]))
             avg_best = result.mean
             avg_gap = (target - avg_best) if target is not None else None
-            rows.append((max_iters, avg_time, avg_best, avg_gap))
+            std_gap = result.std
+            rows.append((max_iters, avg_time, avg_best, avg_gap, std_gap))
             gap_str = f"{avg_gap:8.2f}" if avg_gap is not None else "     n/a"
             print(f"{sched_name:32s} {max_iters:9d} {avg_time:10.4f} {avg_best:9.2f} {gap_str}")
         group_stats[sched_name] = rows
@@ -97,8 +96,9 @@ def main():
         rows_sorted = sorted(rows, key=lambda r: r[0])
         xs = [r[1] for r in rows_sorted]
         ys = [(r[3] if r[3] is not None else r[2]) for r in rows_sorted]
-        ax.plot(xs, ys, color=color_for[sched_name], marker="D", markersize=9,
-                markeredgecolor="black", linewidth=1.5, alpha=0.9, zorder=4)
+        yerr = [r[4] for r in rows_sorted]
+        ax.errorbar(xs, ys, color=color_for[sched_name], marker="D", markersize=9,
+                markeredgecolor="black", linewidth=1.5, alpha=0.9, zorder=4, yerr=yerr, capsize=3)
 
 
     if sa_avg is not None:
