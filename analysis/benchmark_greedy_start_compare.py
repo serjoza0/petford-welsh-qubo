@@ -19,10 +19,9 @@ BOX_WIDTH_FRAC = 0.15
 
 INIT_STRATEGIES = {
     "empty":      None,
-    "greedy":     greedy_min_degree_init,
-    "greedy_jit": greedy_min_degree_init_jit,
+    "greedy_random": random_order_init_jit,
 }
-COLOR_FOR = {"empty": "tab:blue", "greedy": "tab:orange", "greedy_jit": "tab:green"}
+COLOR_FOR = {"empty": "tab:blue", "greedy": "tab:orange", "greedy_jit": "tab:green", "greedy_random": "tab:red", "greedy_random_jit": "tab:purple"}
 
 
 
@@ -54,7 +53,7 @@ def main():
     if args.solver == "jit":
         jit_warmup(graph, A=DEFAULT_A, B=DEFAULT_B, b=DEFAULT_BASE, seed=DEFAULT_SEED)
 
-    greedy_min_degree_init_jit(graph, 1, np.random.default_rng(DEFAULT_SEED))
+    random_order_init_jit(graph, 1, np.random.default_rng(DEFAULT_SEED))
 
     print(f"--- {name} (n={graph.n}, m={graph.m}) known alpha={target} ---")
     print(f"{'init':>7s} {'max_iters':>10s} {'avg_time':>10s} {'avg_best':>9s} {'avg_gap':>8s}")
