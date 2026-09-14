@@ -7,29 +7,9 @@ import matplotlib.pyplot as plt
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
 from scripts import *
-
-KNOWN_ALPHA = {
-    "C125.9": 34, "MANN_a9": 16, "brock200-4": 17,
-    "brock800_1": 23, "brock800_2": 24, "brock800_3": 25, "brock800_4": 26,
-    "c-fat200-1": 12, "c-fat200-2": 24, "c-fat200-5": 58,
-    "c-fat500-1": 14, "c-fat500-2": 26, "c-fat500-5": 64,
-    "dsjc125.5": 10, "dsjc125.9": 34,
-    "evil-N120-p98-chv12x10": 20, "evil-N120-p98-myc5x24": 48,
-    "evil-N121-p98-myc11x11": 22, "evil-N125-p98-s3m25x5": 20,
-    "hamming6_2": 32, "hamming6_4": 4,
-    "johnson16_2_4": 8, "johnson8_2_4": 4, "johnson8_4_4": 14,
-    "keller4": 11, "p-hat500-1": 9,
-    "p_hat1500_1": 12, "p_hat1500_2": 65, "p_hat1500_3": 94,
-    "paley101": 5, "paley61": 5, "paley73": 5, "paley89": 5, "paley97": 6,
-    "san200-0-7-1": 30, "san200-0-7-2": 18, "sanr200-0-7": 18,
-}
+from benchmark_common import KNOWN_ALPHA, DEFAULT_A, DEFAULT_B, DEFAULT_BASE, DEFAULT_MAX_ITERS, DEFAULT_NUM_ATTEMPTS, DEFAULT_SEED
 
 DEFAULT_RATIO_GRID = [0.5, 1, 1.5, 2, 3, 5, 8, 12, 20]
-DEFAULT_MAX_ITERS = 100000
-DEFAULT_NUM_ATTEMPTS = 5
-A = 1
-B_SCHEDULE = 18
-SEED = 0
 
 SCHEDULE_BUILDERS = {
     "geometric": lambda r_start, r_end, max_iters: np.geomspace(r_start, r_end, num=max_iters),
@@ -41,8 +21,8 @@ def run_attempts(graph, B_arr, max_iters, num_attempts, seed):
     vals = []
     for i in range(num_attempts):
         rng = np.random.default_rng(seed + i)
-        _, best_value, _, _ = petford_welsh_jit_ratio_schedule(
-            graph, A=A, B=B_arr, b=B_SCHEDULE, max_iters=max_iters, rng=rng,
+        _, best_value, _, _ = petford_welsh_jit(
+            graph, A=DEFAULT_A, B=B_arr, b=DEFAULT_BASE, max_iters=max_iters, rng=rng,
         )
         vals.append(best_value)
     return vals
@@ -91,7 +71,7 @@ def main():
 
     warm_path = os.path.join(base_dir, "instances", "stable_set", f"{args.instances[0]}_stable_set_edge_list.txt")
     warm_graph = CSRGraph.from_edge_list_file(warm_path, name=args.instances[0])
-    petford_welsh_jit_ratio_schedule(warm_graph, A=A, B=B_SCHEDULE, b=B_SCHEDULE, max_iters=10, rng=np.random.default_rng(1))
+    petford_welsh_jit(warm_graph, A=DEFAULT_A, B=DEFAULT_B, b=DEFAULT_BASE, max_iters=10, rng=np.random.default_rng(1))
 
     rel_gap_sums = {s: np.zeros((len(args.ratio_grid), len(args.ratio_grid))) for s in args.schedules}
     n_ok = 0
@@ -110,7 +90,7 @@ def main():
         t0 = time.perf_counter()
         for schedule_name in args.schedules:
             rel_gap = run_sweep_rel_gap(
-                graph, target, args.ratio_grid, args.max_iters, args.num_attempts, SEED,
+                graph, target, args.ratio_grid, args.max_iters, args.num_attempts, DEFAULT_SEED,
                 SCHEDULE_BUILDERS[schedule_name],
             )
             rel_gap_sums[schedule_name] += rel_gap

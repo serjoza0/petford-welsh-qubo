@@ -41,7 +41,7 @@ def run_attempts(graph, B_arr, max_iters, num_attempts, seed):
     times = []
     for i in range(num_attempts):
         rng = np.random.default_rng(seed + i)
-        _, best_value, _, elapsed = petford_welsh_jit_ratio_schedule(
+        _, best_value, _, elapsed = petford_welsh_jit(
             graph, A=A, B=B_arr, b=B_SCHEDULE, max_iters=max_iters, rng=rng,
         )
         vals.append(best_value)
@@ -79,7 +79,7 @@ def main():
     path = os.path.join(base_dir, "instances", "stable_set", f"{name}_stable_set_edge_list.txt")
     graph = CSRGraph.from_edge_list_file(path, name=name)
 
-    petford_welsh_jit_ratio_schedule(graph, A=A, B=B_SCHEDULE, b=B_SCHEDULE, max_iters=10, rng=np.random.default_rng(1))
+    petford_welsh_jit(graph, A=A, B=B_SCHEDULE, b=B_SCHEDULE, max_iters=10, rng=np.random.default_rng(1))
 
     total_runs = len(args.ratio_grid) ** 2 * len(args.schedules) * len(args.max_iters_grid) * args.num_attempts
     print(f"--- {name} (n={graph.n}, m={graph.m}) known alpha={target} ---")

@@ -10,29 +10,14 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.
 from scripts import *
 from scripts.solver import petford_welsh
 from scripts.problems import MaxStableSetProblem
-
-KNOWN_ALPHA = {
-    "C125.9": 34, "MANN_a9": 16, "brock200-4": 17,
-    "brock800_1": 23, "brock800_2": 24, "brock800_3": 25, "brock800_4": 26,
-    "c-fat200-1": 12, "c-fat200-2": 24, "c-fat200-5": 58,
-    "c-fat500-1": 14, "c-fat500-2": 26, "c-fat500-5": 64,
-    "dsjc125.5": 10, "dsjc125.9": 34,
-    "evil-N120-p98-chv12x10": 20, "evil-N120-p98-myc5x24": 48,
-    "evil-N121-p98-myc11x11": 22, "evil-N125-p98-s3m25x5": 20,
-    "hamming6_2": 32, "hamming6_4": 4,
-    "johnson16_2_4": 8, "johnson8_2_4": 4, "johnson8_4_4": 14,
-    "keller4": 11, "p-hat500-1": 9,
-    "p_hat1500_1": 12, "p_hat1500_2": 65, "p_hat1500_3": 94,
-    "paley101": 5, "paley61": 5, "paley73": 5, "paley89": 5, "paley97": 6,
-    "san200-0-7-1": 30, "san200-0-7-2": 18, "sanr200-0-7": 18,
-}
+from benchmark_common import KNOWN_ALPHA
 
 A = 1
-B = 1.5
-B_SCHEDULE = 18
+B = 2
+B_SCHEDULE = 8
 
-ITERS_PER_N = 50
-MIN_ITERS = 500
+ITERS_PER_N = 500
+MIN_ITERS = 5000
 
 
 def run_attempt(graph, seed, max_iters):
@@ -80,8 +65,8 @@ def run_instance(graph, name, target, max_iters, num_attempts, seed):
         "known_alpha": target if target is not None else "",
         "avg_best": float(np.mean(best_vals)), "avg_repaired": float(np.mean(repaired_vals)),
         "max_best": max(best_vals), "max_repaired": max(repaired_vals),
-        "gap_best": (target - float(np.mean(best_vals))) if target is not None else "",
-        "gap_repaired": (target - float(np.mean(repaired_vals))) if target is not None else "",
+        "gap_best": (target - max(best_vals)) if target is not None else "",
+        "gap_repaired": (target - max(repaired_vals)) if target is not None else "",
         "best_wins": best_wins, "repaired_wins": repaired_wins, "ties": ties,
     }
     return summary, attempt_rows
@@ -93,9 +78,10 @@ def main():
                          help="specific instance names; default is every *.txt in instances/stable_set")
     parser.add_argument("--iters-per-n", type=int, default=ITERS_PER_N)
     parser.add_argument("--min-iters", type=int, default=MIN_ITERS)
-    parser.add_argument("--num-attempts", type=int, default=5)
+    parser.add_argument("--num-attempts", type=int, default=50)
     parser.add_argument("--max-n", type=int, default=None, help="skip instances larger than this (python solver is slow)")
     parser.add_argument("--seed", type=int, default=0)
+    parser.add_argument("--latex", action="store_true", help="save LaTeX table of results")
     args = parser.parse_args()
 
     base_dir = os.getcwd()
@@ -162,6 +148,14 @@ def main():
     #     writer.writeheader()
     #     writer.writerows(attempt_rows)
     # print(f"Wrote {len(attempt_rows)} rows to {attempts_path}")
+
+    if args.latex:
+        import pandas as pd
+        df = pd.DataFrame(summaries)
+        df = df.drop(columns=["best_wins","repaired_wins","ties"])
+        latex_table = df.to_latex(index=False, float_format="%.2f", escape=True)
+        with open(os.path.join(base_dir, "report", "test_last_state.tex"), "w") as f:
+            f.write(latex_table)
 
 
 if __name__ == "__main__":
