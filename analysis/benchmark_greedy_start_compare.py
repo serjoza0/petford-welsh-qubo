@@ -25,11 +25,11 @@ COLOR_FOR = {"empty": "tab:blue", "greedy": "tab:orange", "greedy_jit": "tab:gre
 
 
 
-def run_pw_sweep(graph, max_iters_list, num_attempts, seed, solver, init_fn):
+def run_pw_sweep(graph, max_iters_list, num_attempts, seed, init_fn):
     points = []
     for max_iters in max_iters_list:
         result = run_multi_start(
-            graph, solver=solver, A=DEFAULT_A, B=DEFAULT_B, b=DEFAULT_BASE,
+            graph, A=DEFAULT_A, B=DEFAULT_B, b=DEFAULT_BASE,
             max_iters=max_iters, num_attempts=num_attempts, seed=seed,
             init_fn=init_fn,
         )
@@ -41,7 +41,6 @@ def main():
     parser = argparse.ArgumentParser()
     add_instance_arg(parser)
     parser.add_argument("--num-attempts", type=int, default=DEFAULT_NUM_ATTEMPTS)
-    add_solver_arg(parser)
     add_skip_sa_arg(parser)
     args = parser.parse_args()
 
@@ -50,10 +49,9 @@ def main():
     target = KNOWN_ALPHA.get(name)
     graph = load_instance(name, base_dir)
 
-    if args.solver == "jit":
-        jit_warmup(graph, A=DEFAULT_A, B=DEFAULT_B, b=DEFAULT_BASE, seed=DEFAULT_SEED)
+    jit_warmup(graph, A=DEFAULT_A, B=DEFAULT_B, b=DEFAULT_BASE, seed=DEFAULT_SEED)
 
-    random_order_init_jit(graph, 1, np.random.default_rng(DEFAULT_SEED))
+    random_order_init_jit(graph, np.random.default_rng(DEFAULT_SEED))
 
     print(f"--- {name} (n={graph.n}, m={graph.m}) known alpha={target} ---")
     print(f"{'init':>7s} {'max_iters':>10s} {'avg_time':>10s} {'avg_best':>9s} {'avg_gap':>8s}")
@@ -61,7 +59,7 @@ def main():
     all_points = {}
     group_stats = {}
     for init_label, init_fn in INIT_STRATEGIES.items():
-        pw_points = run_pw_sweep(graph, DEFAULT_MAX_ITERS_LIST, args.num_attempts, DEFAULT_SEED, args.solver, init_fn)
+        pw_points = run_pw_sweep(graph, DEFAULT_MAX_ITERS_LIST, args.num_attempts, DEFAULT_SEED, init_fn)
         all_points[init_label] = pw_points
 
         rows = []

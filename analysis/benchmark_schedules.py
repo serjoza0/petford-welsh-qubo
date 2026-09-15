@@ -40,7 +40,6 @@ def main():
     parser = argparse.ArgumentParser()
     add_instance_arg(parser)
     parser.add_argument("--num-attempts", type=int, default=20)
-    add_solver_arg(parser)
     add_skip_sa_arg(parser)
     args = parser.parse_args()
 
@@ -49,8 +48,8 @@ def main():
     target = KNOWN_ALPHA.get(name)
     graph = load_instance(name, base_dir)
 
-    if args.solver == "jit":
-        petford_welsh_jit(graph, A=A, B=B, b=4.0, max_iters=10, rng=np.random.default_rng(0))  # warm up numba
+
+    petford_welsh_jit(graph, A=A, B=B, b=4.0, max_iters=10, rng=np.random.default_rng(0))  # warm up numba
 
     print(f"--- {name} (n={graph.n}, m={graph.m}) known alpha={target} ---")
     print(f"{'schedule':32s} {'max_iters':>9s} {'avg_time':>10s} {'avg_best':>9s} {'avg_gap':>8s}")
@@ -62,7 +61,7 @@ def main():
         for max_iters in MAX_ITERS:
             b = sched_fn(max_iters)
             result = run_multi_start(
-                graph, solver=args.solver, A=A, B=B, b=b,
+                graph, A=A, B=B, b=b,
                 max_iters=max_iters, num_attempts=args.num_attempts, seed=SEED,
             )
             avg_time = float(np.mean([a.elapsed for a in result.attempts]))

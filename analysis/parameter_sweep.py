@@ -8,7 +8,6 @@ from scripts import *
 
 
 
-SOLVER = "jit"
 B_RATIOS = [1.5, 2, 3, 5, 7, 10, 15, 20, 30, 50, 100, 200]
 BASES = [3, 4, 5, 6, 7, 8, 10, 12, 15, 18, 20, 25, 30, 40, 50, 75, 100]
 
@@ -25,7 +24,7 @@ def main():
             B = DEFAULT_A * ratio
             for base in BASES:
                 result = run_multi_start(
-                    graph, solver=SOLVER, A=DEFAULT_A, B=B, b=base,
+                    graph, A=DEFAULT_A, B=B, b=base,
                     max_iters=DEFAULT_MAX_ITERS, num_attempts=DEFAULT_NUM_ATTEMPTS, seed=DEFAULT_SEED,
                 )
                 rows.append({

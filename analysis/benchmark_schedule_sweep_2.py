@@ -15,14 +15,14 @@ SCHEDULE_BUILDERS = {
     "linear":    lambda b_start, b_end, max_iters: np.linspace(b_start, b_end, num=max_iters),
 }
 
-def run_sweep_rel_gap(graph, target, b_grid, max_iters, num_attempts, seed, solver, build_schedule):
+def run_sweep_rel_gap(graph, target, b_grid, max_iters, num_attempts, seed, build_schedule):
     ng = len(b_grid)
     rel_gap = np.zeros((ng, ng))
     for i, b_start in enumerate(b_grid):
         for j, b_end in enumerate(b_grid):
             b_schedule = build_schedule(b_start, b_end, max_iters)
             result = run_multi_start(
-                graph, solver=solver, A=DEFAULT_A, B=DEFAULT_B, b=b_schedule,
+                graph, A=DEFAULT_A, B=DEFAULT_B, b=b_schedule,
                 max_iters=max_iters, num_attempts=num_attempts, seed=seed,
             )
             avg_best = float(np.mean([a.best_value for a in result.attempts]))
@@ -35,7 +35,6 @@ def main():
     parser.add_argument("--b-grid", type=float, nargs="+", default=DEFAULT_B_GRID)
     parser.add_argument("--max-iters", type=int, default=DEFAULT_MAX_ITERS)
     parser.add_argument("--num-attempts", type=int, default=DEFAULT_NUM_ATTEMPTS)
-    parser.add_argument("--solver", choices=["python", "jit"], default="jit")
     parser.add_argument("--schedules", choices=list(SCHEDULE_BUILDERS), nargs="+",
                          default=["geometric", "linear"])
     args = parser.parse_args()
@@ -47,9 +46,8 @@ def main():
     base_dir = os.getcwd()
     names = all_instance_names(base_dir)
 
-    if args.solver == "jit":
-        graph = load_instance(names[0],base_dir)
-        jit_warmup(graph, A=DEFAULT_A, B=DEFAULT_B, b=DEFAULT_BASE, seed=1)
+    graph = load_instance(names[0],base_dir)
+    jit_warmup(graph, A=DEFAULT_A, B=DEFAULT_B, b=DEFAULT_BASE, seed=1)
 
     rel_gap_sums = {s: np.zeros((len(args.b_grid), len(args.b_grid))) for s in args.schedules}
     n_ok = 0
@@ -66,7 +64,7 @@ def main():
         t0 = time.perf_counter()
         for schedule_name in args.schedules:
             rel_gap = run_sweep_rel_gap(
-                graph, target, args.b_grid, args.max_iters, args.num_attempts, DEFAULT_SEED, args.solver,
+                graph, target, args.b_grid, args.max_iters, args.num_attempts, DEFAULT_SEED,
                 SCHEDULE_BUILDERS[schedule_name],
             )
             rel_gap_sums[schedule_name] += rel_gap

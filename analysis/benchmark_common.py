@@ -122,10 +122,6 @@ def add_instances_arg(parser):
                          help="specific instance names; default is every instance in instances/stable_set")
     return parser
 
-def add_solver_arg(parser, default="jit"):
-    parser.add_argument("--solver", choices=["python", "jit"], default=default)
-    return parser
-
 def add_pw_args(parser, default_max_iters=DEFAULT_MAX_ITERS, default_num_attempts=DEFAULT_NUM_ATTEMPTS, default_seed=DEFAULT_SEED):
     parser.add_argument("--max-iters", type=int, default=default_max_iters)
     parser.add_argument("--num-attempts", type=int, default=default_num_attempts)

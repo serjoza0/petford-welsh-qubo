@@ -17,11 +17,11 @@ SA_BETA = 0.5
 BOX_WIDTH_FRAC = 0.15
 
 
-def run_pw_sweep(graph, max_iters_list, num_attempts, seed, solver):
+def run_pw_sweep(graph, max_iters_list, num_attempts, seed):
     points = []
     for max_iters in max_iters_list:
         result = run_multi_start(
-            graph, solver=solver, A=DEFAULT_A, B=DEFAULT_B, b=DEFAULT_BASE,
+            graph, A=DEFAULT_A, B=DEFAULT_B, b=DEFAULT_BASE,
             max_iters=max_iters, num_attempts=num_attempts, seed=seed,
         )
         points.extend((max_iters, a.best_value, a.elapsed) for a in result.attempts)
@@ -32,7 +32,6 @@ def main():
     add_instance_arg(parser)
     parser.add_argument("--max-iters", type=int, nargs="+", default=DEFAULT_MAX_ITERS)
     parser.add_argument("--num-attempts", type=int, default=20)
-    add_solver_arg(parser)
     add_skip_sa_arg(parser)
     args = parser.parse_args()
 
@@ -40,10 +39,9 @@ def main():
     name = args.instance
     target = KNOWN_ALPHA.get(name)
     graph = load_instance(name, base_dir)
-    if args.solver == "jit":
-        jit_warmup(graph, A=DEFAULT_A, B=DEFAULT_B, b=DEFAULT_BASE, seed=1)
+    jit_warmup(graph, A=DEFAULT_A, B=DEFAULT_B, b=DEFAULT_BASE, seed=1)
 
-    pw_points = run_pw_sweep(graph, args.max_iters, args.num_attempts, DEFAULT_SEED, args.solver)
+    pw_points = run_pw_sweep(graph, args.max_iters, args.num_attempts, DEFAULT_SEED)
     print(f"--- {name} (n={graph.n}, m={graph.m}) known alpha={target} ---")
     print(f"{'max_iters':>10s} {'avg_time':>10s} {'avg_best':>9s} {'avg_gap':>8s}")
 
