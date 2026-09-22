@@ -1,0 +1,5 @@
+numpy>=2.53
+numba>=0.67
+networkx>=3.5
+scipy>=1.18.1
+tqdm>=4.70
