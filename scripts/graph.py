@@ -114,15 +114,12 @@ class CSRGraph(NamedTuple):
         array([0, 2], dtype=int32)
         """
         e = np.asarray(edges, dtype=np.int64).reshape(-1, 2)
-
-        # n_self = int((e[:, 0] == e[:, 1]).sum())
         e = e[e[:, 0] != e[:, 1]]
 
         lo = np.minimum(e[:, 0], e[:, 1])
         hi = np.maximum(e[:, 0], e[:, 1])
         key = lo * n + hi                      # canonical id per undirected edge
         keep = np.unique(key, return_index=True)[1]
-        # n_dup = len(key) - len(keep)
         lo, hi = lo[keep], hi[keep]
         m = len(lo)
 

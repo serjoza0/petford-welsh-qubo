@@ -35,8 +35,8 @@ import numpy as np
 from numba import njit
 
 @njit(cache=True)
-def _run_core_combined(state, neighbor_sum, is_conflicted, offsets, nbrs,
-                        A, B_arr, temps, candidate_draws, accept_draws, max_iters):
+def _run_core(state, neighbor_sum, is_conflicted, offsets, nbrs,
+                        A, B, temp, candidate_draws, accept_draws, max_iters):
     """Numba kernel: run the iterations and track the best feasible state.
  
     All random numbers and per-iteration parameters are computed in advance
@@ -57,9 +57,9 @@ def _run_core_combined(state, neighbor_sum, is_conflicted, offsets, nbrs,
         CSR structure of the graph.
     A : float
         Reward for each vertex in the set.
-    B_arr : np.ndarray of float64, shape (>= max_iters,)
+    B : float
         Conflict penalty for each iteration.
-    temps : np.ndarray of float64, shape (>= max_iters,)
+    temp : float
         Temperature ``1 / ln(b)`` for each iteration.
     candidate_draws : np.ndarray of int64, shape (>= max_iters,)
         Vertex to update at each iteration.
@@ -100,11 +100,9 @@ def _run_core_combined(state, neighbor_sum, is_conflicted, offsets, nbrs,
         u = candidate_draws[it]
         x_u = state[u]
         s = neighbor_sum[u]
-        B = B_arr[it]
         X0 = 0
         X1 = B * s - A
  
-        temp = temps[it]
         m = X0 if X0 < X1 else X1
         w0 = np.exp((m - X0) / temp)
         w1 = np.exp((m - X1) / temp)
@@ -136,34 +134,6 @@ def _run_core_combined(state, neighbor_sum, is_conflicted, offsets, nbrs,
     return best_state, best_value, best_step
  
  
-def _to_schedule_array(x, max_iters):
-    """Expand a parameter given as a constant, array, or function into a per-iteration array.
- 
-    Parameters
-    ----------
-    x : float, array-like, or callable
-        * A scalar (Python or NumPy): repeated ``max_iters`` times.
-        * A callable: called as ``x(it)`` for ``it = 0 .. max_iters-1``,
-          one Python call per iteration.
-        * Anything else: converted with ``np.asarray`` and returned without
-          any length check. It must have at least ``max_iters`` entries
-          (see the bounds warning in :func:`_run_core_combined`). A 0-d
-          array counts as "anything else", not as a scalar.
-    max_iters : int
-        Number of iterations.
- 
-    Returns
-    -------
-    np.ndarray of float64
-        The per-iteration values.
-    """
-    if callable(x):
-        return np.asarray([x(it) for it in range(max_iters)], dtype=np.float64)
-    if np.isscalar(x):
-        return np.full(max_iters, float(x))
-    return np.asarray(x, dtype=np.float64)
- 
- 
 def petford_welsh_jit(graph, A=1.0, B=2.0, b=10.0, max_iters=1000, rng=None, init_fn=None):
     """Search for a large stable set with Petford-Welsh.
  
@@ -173,14 +143,9 @@ def petford_welsh_jit(graph, A=1.0, B=2.0, b=10.0, max_iters=1000, rng=None, ini
         The input graph.
     A : float, default 1.0
         Reward for each vertex in the set. Must be a constant.
-    B : float, array-like, or callable, default 2.0
-        Penalty for each conflicting edge. Can be:
- 
-        * a constant;
-        * an array with at least ``max_iters`` entries;
-        * a function ``B(it) -> float`` of the 0-based iteration number.
-    b : float, array-like, or callable, default 10
-        Petford-Welsh base, accepted in the same three forms as ``B``.
+    B : float, default 2.0
+        Conflict penalty. Must be a constant.
+    b : float, default 10.0
         Every value must be greater than 1. The corresponding temperature is ``T = 1 / ln(b)``.
     max_iters : int, default 1000
         Number of single-vertex updates.
@@ -188,7 +153,7 @@ def petford_welsh_jit(graph, A=1.0, B=2.0, b=10.0, max_iters=1000, rng=None, ini
         Source of randomness. A fresh unseeded generator is used if
         omitted.
     init_fn : InitFn, optional
-        Called as ``init_fn(graph, 2, rng)`` to produce the starting
+        Called as ``init_fn(graph, rng)`` to produce the starting
         state; see :mod:`init_fns`. Its output is copied, not modified.
         If omitted, the search starts from the empty set.
  
@@ -215,25 +180,15 @@ def petford_welsh_jit(graph, A=1.0, B=2.0, b=10.0, max_iters=1000, rng=None, ini
     >>> state, size, step, secs = petford_welsh_jit(
     ...     graph, A=1.0, B=2.0, b=4.0, max_iters=100_000,
     ...     rng=rng, init_fn=random_order_init_jit)
- 
-    Annealing ``b`` from 2 to 20 over the run:
- 
-    >>> iters = 100_000
-    >>> petford_welsh_jit(graph, b=np.geomspace(2, 20, iters), max_iters=iters)
     """
+    if b <= 1.0:
+        raise ValueError(f"b must be > 1, got {b}")
+
     t0 = time.perf_counter()
  
     rng = rng or np.random.default_rng()
     n = graph.n
- 
-    b_arr = _to_schedule_array(b, max_iters)
-    temps = 1.0 / np.log(b_arr)
-    B_arr = _to_schedule_array(B, max_iters)
-
-    if len(B_arr) < max_iters:
-        raise ValueError(f"B array has length {len(B_arr)} < max_iters={max_iters}")
-    if len(temps) < max_iters:
-        raise ValueError(f"b array has length {len(temps)} < max_iters={max_iters}")
+    temp = 1.0 / np.log(b)
  
     candidate_draws = rng.integers(0, n, size=max_iters)
     accept_draws = rng.random(size=max_iters)
@@ -251,9 +206,9 @@ def petford_welsh_jit(graph, A=1.0, B=2.0, b=10.0, max_iters=1000, rng=None, ini
         neighbor_sum = np.zeros(n, dtype=np.int64)
         is_conflicted = np.zeros(n, dtype=np.bool_)
  
-    best_state, best_value, best_step = _run_core_combined(
+    best_state, best_value, best_step = _run_core(
         state, neighbor_sum, is_conflicted, offsets, nbrs,
-        A, B_arr, temps, candidate_draws, accept_draws, max_iters,
+        A, B, temp, candidate_draws, accept_draws, max_iters,
     )
     elapsed = time.perf_counter() - t0
  

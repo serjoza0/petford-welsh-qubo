@@ -19,6 +19,7 @@ from time import perf_counter
 import os
 import glob
 import csv
+from tqdm import tqdm
 
 from .graph import CSRGraph
 from .solver_jit import petford_welsh_jit
@@ -31,6 +32,12 @@ class AttemptResult:
     ----------
     seed : int
         Seed of the ``np.random.Generator`` used for this run.
+    A : float
+        Reward for each vertex in the set.
+    B : float
+        Conflict penalty.
+    b : float
+        Petford-Welsh base.
     best_value : int
         Size of the largest feasible set found.
     elapsed : float
@@ -39,6 +46,9 @@ class AttemptResult:
         0.5 s).
     """
     seed: int
+    A: float
+    B: float
+    b: float
     best_value: int
     best_step: int
     elapsed: float
@@ -55,14 +65,6 @@ class ExperimentResult:
         Instance name.
     n, m : int
         Number of vertices and edges.
-    A : float
-        Penalty weights passed to the solver. ``B`` is stored as given, so
-        it may also be a schedule array or a function.
-    B_repr : str
-        Short text description of the ``B`` argument; see :func:`_repr`.
-    b_repr : str
-        Short text description of the ``b`` argument; see
-        :func:`_b_repr`.
     max_iters : int
         Iterations per attempt.
     num_attempts : int
@@ -79,8 +81,6 @@ class ExperimentResult:
     n: int
     m: int
     A: float
-    B_repr: str
-    b_repr: str
     max_iters: int
     num_attempts: int
     attempts: list[AttemptResult] = field(default_factory=list)
@@ -106,34 +106,12 @@ class ExperimentResult:
     def to_row(self) -> dict:
         return {
             "instance": self.instance, "n": self.n, "m": self.m,
-            "A": self.A, "B": self.B_repr, "b": self.b_repr,
             "max_iters": self.max_iters, "num_attempts": self.num_attempts,
             "best": self.best, "mean": self.mean, "std": self.std,
             "time_sec": self.total_time,
             "known_alpha": self.known_alpha if self.known_alpha is not None else "",
             "gap": self.gap if self.gap is not None else "",
         }
-
-
-
-def _repr(b: float | np.ndarray | Callable[[int], float]) -> str:
-    """Return a short text description of a ``b`` argument for reports.
- 
-    Returns
-    -------
-    str
-        * ``"fn"`` for a function;
-        * ``repr(b)`` for a scalar, for example ``"4.0"``;
-        * for an array, its length and first and last values, for example
-          ``"array(len=100000, 2->20)"``.
-    """
-    if callable(b):
-        return "fn"
-    if np.isscalar(b):
-        return repr(b)
-    arr = np.asarray(b)
-    return f"array(len={len(arr)}, {arr[0]:.3g}->{arr[-1]:.3g})"
-
 
 def _run_attempt_jit(graph: CSRGraph, A: float, B: float, b, max_iters: int,
                       seed: int, init_fn=None) -> AttemptResult:
@@ -147,7 +125,8 @@ def _run_attempt_jit(graph: CSRGraph, A: float, B: float, b, max_iters: int,
     _, best_value, best_step, elapsed = petford_welsh_jit(
         graph, A=A, B=B, b=b, max_iters=max_iters, rng=rng, init_fn=init_fn
     )
-    return AttemptResult(seed=seed, best_value=int(best_value), best_step=int(best_step), elapsed=elapsed)
+    return AttemptResult(seed=seed, A=A, B=B, b=b, best_value=int(best_value),
+                          best_step=int(best_step), elapsed=elapsed)
 
 def _load_graph(graph_or_path: CSRGraph | str, name: str | None = None) -> CSRGraph:
     """Return a graph unchanged, or load it from an edge-list file.
@@ -171,18 +150,51 @@ def _load_graph(graph_or_path: CSRGraph | str, name: str | None = None) -> CSRGr
     inferred_name = name or os.path.basename(path).replace("_stable_set_edge_list.txt", "")
     return CSRGraph.from_edge_list_file(path, name=inferred_name)
 
+def _pairs_for(B: float | np.ndarray, b: float | np.ndarray) -> list[tuple[float, float]]:
+    """Build the ordered list of ``(B, b)`` pairs attempts cycle through.
+ 
+    * both scalars -> one pair;
+    * one array -> one pair per array entry, in order, the scalar fixed;
+    * both arrays -> the cross product, ``B`` varying slower (same order
+      as ``itertools.product(B, b)``).
+ 
+    Every ``b`` value must be greater than 1 (see :func:`solver_jit.
+    petford_welsh_jit`); this is checked up front so a bad value fails
+    before any attempts run, not partway through.
+    """
+    B_is_scalar = np.isscalar(B)
+    b_is_scalar = np.isscalar(b)
+ 
+    if B_is_scalar and b_is_scalar:
+        pairs = [(float(B), float(b))]
+    elif B_is_scalar:
+        pairs = [(float(B), float(bv)) for bv in np.asarray(b)]
+    elif b_is_scalar:
+        pairs = [(float(Bv), float(b)) for Bv in np.asarray(B)]
+    else:
+        pairs = [(float(Bv), float(bv)) for Bv in np.asarray(B) for bv in np.asarray(b)]
+ 
+    bad = [bv for _, bv in pairs if bv <= 1]
+    if bad:
+        raise ValueError(f"every b value must be > 1, got: {sorted(set(bad))}")
+    return pairs
+
+def _per_attempt(pairs: list[tuple[float, float]], i: int) -> tuple[float, float]:
+    """Return the ``(B, b)`` pair used on attempt ``i``, cycling past the end."""
+    return pairs[i % len(pairs)]
 
 def run_multi_start(
     graph: CSRGraph | str,
     *,
     A: float = 1.0,
-    B: float = 2.0,
-    b: float = 4.0,
+    B: float | np.ndarray = 2.0,
+    b: float | np.ndarray= 4.0,
     max_iters: int = 100000,
     num_attempts: int = 10,
     seed: int = 0,
     known_alpha: int | None = None,
     init_fn = None,
+    show_progress: bool = True,
 ) -> ExperimentResult:
     """Run the solver several times on one instance with consecutive seeds.
  
@@ -196,9 +208,9 @@ def run_multi_start(
         before the attempts start.
     A : float, default 1.0
         Reward for each vertex in the set.
-    B : float, array-like, or callable, default 2.0
+    B : float, array-like, default 2.0
         Conflict penalty.
-    b : float, array-like, or callable, default 4.0
+    b : float, array-like, default 4.0
         Petford-Welsh base.
     max_iters : int, default 100000
         Iterations per attempt.
@@ -219,15 +231,17 @@ def run_multi_start(
         Per-attempt results and summary statistics.
     """
     g = _load_graph(graph)
+    pairs = _pairs_for(B, b)
 
     result = ExperimentResult(
         instance=g.name, n=g.n, m=g.m,
-        A=A, B_repr=_repr(B), b_repr=_repr(b), max_iters=max_iters, num_attempts=num_attempts, known_alpha=known_alpha,
+        A=A, max_iters=max_iters, num_attempts=num_attempts, known_alpha=known_alpha,
     )
 
     t0 = perf_counter()
-    for i in range(num_attempts):
-        result.attempts.append(_run_attempt_jit(g, A, B, b, max_iters, seed+i, init_fn))
+    for i in tqdm(range(num_attempts), disable=not show_progress):
+        B_i, b_i = _per_attempt(pairs, i)
+        result.attempts.append(_run_attempt_jit(g, A, B_i, b_i, max_iters, seed+i, init_fn))
     result.total_time = perf_counter() - t0
     return result
 
@@ -331,6 +345,7 @@ def save_attempts_csv(results: list, path: str) -> None:
             rows.append({
                 "instance": r.instance, "seed": a.seed,
                 "best_value": a.best_value, "best_step": a.best_step, "elapsed": a.elapsed,
+                "A": a.A, "B": a.B, "b": a.b,
                 "known_alpha": r.known_alpha if r.known_alpha is not None else "",
             })
     if not rows:
