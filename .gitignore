@@ -2,4 +2,3 @@ __pycache__/
 *.pyc
 .vscode/
 report/
-instances/bhoslib/
