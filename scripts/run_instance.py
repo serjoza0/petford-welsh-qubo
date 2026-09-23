@@ -7,11 +7,12 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.
 from scripts import *
 
 DEFAULT_A = 1.0
-DEFAULT_B = np.array([1.0, 2.0, 3.0, 5.0, 8.0, 10.0, 15.0, 20.0, 30.0, 50.0])
+DEFAULT_B = np.array([1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5])
 DEFAULT_BASE = np.array([1.5, 2.0, 3.0, 5.0, 8.0, 10.0, 15.0, 20.0, 30.0, 50.0])
 DEFAULT_SEED = 0
 DEFAULT_NUM_ATTEMPTS = 1000
 DEFAULT_TIME_LIMIT = 3.0
+DEFAULT_MAX_ITERS_FACTOR = 100
 CALIB_ITERS = 1000000
 CALIB_ATTEMPTS = 100
 
@@ -28,8 +29,10 @@ def main():
     parser = argparse.ArgumentParser(
         description=(
             "Run Petford-Welsh on a single instance file, by path. "
-            "Give exactly two of --max-iters/--time-per-attempt (one slot, pick a unit), "
-            "--num-attempts, and --time-limit (total, across every attempt) -- the third is derived."
+            "--max-iters/--time-per-attempt (one slot, pick a unit) default to a size-based "
+            "max_iters (round(n * --max-iters-factor), no calibration) when neither is given. "
+            "Give at most one of --num-attempts and --time-limit (total, across every attempt) "
+            "-- the other is derived; if neither is given, --num-attempts defaults too."
         ),
     )
     parser.add_argument("instance_path", help="path to a *_stable_set_edge_list.txt file")
@@ -37,10 +40,15 @@ def main():
     parser.add_argument("--B", type=float, default=DEFAULT_B, help="B/A ratio penalty")
     parser.add_argument("--base", type=float, default=DEFAULT_BASE, help="Petford-Welsh base b")
     parser.add_argument("--seed", type=int, default=DEFAULT_SEED)
-    parser.add_argument("--max-iters", type=int, default=None, help="iterations per attempt")
+    parser.add_argument("--max-iters", type=int, default=None,
+                         help="iterations per attempt; if neither this nor --time-per-attempt is given, "
+                              "defaults to round(n * --max-iters-factor), no calibration needed")
     parser.add_argument("--time-per-attempt", type=float, default=None,
                          help="seconds per attempt; alternative unit for --max-iters, converted via a "
                               "quick calibration run on this graph")
+    parser.add_argument("--max-iters-factor", type=float, default=DEFAULT_MAX_ITERS_FACTOR,
+                         help="used to derive the default --max-iters (round(n * this)) when neither "
+                              "--max-iters nor --time-per-attempt is given")
     parser.add_argument("--num-attempts", type=int, default=None)
     parser.add_argument("--time-limit", type=float, default=None,
                          help="total wall-clock seconds across all attempts combined")
@@ -55,32 +63,30 @@ def main():
         raise SystemExit("pass only one of --max-iters or --time-per-attempt -- they're two units for "
                           "the same thing (effort per attempt)")
 
-    has_effort = args.max_iters is not None or args.time_per_attempt is not None
-    has_num_attempts = args.num_attempts is not None
-    has_time_limit = args.time_limit is not None
-    n_given = sum([has_effort, has_num_attempts, has_time_limit])
-
-    if n_given == 0:
-        args.num_attempts = DEFAULT_NUM_ATTEMPTS
-        args.time_limit = DEFAULT_TIME_LIMIT
-        has_num_attempts = has_time_limit = True
-    elif n_given == 1:
-        if has_effort or has_time_limit:
-            args.num_attempts = DEFAULT_NUM_ATTEMPTS
-            has_num_attempts = True
-        else:
-            args.time_limit = DEFAULT_TIME_LIMIT
-            has_time_limit = True
-    elif n_given == 3:
-        raise SystemExit(
-            "give exactly two of: --max-iters (or --time-per-attempt), --num-attempts, --time-limit, "
-            "not all three -- the third is derived, not an independent input."
-        )
-
     if not os.path.isfile(args.instance_path):
         raise SystemExit(f"instance file not found: {args.instance_path}")
     name = os.path.basename(args.instance_path).replace("_stable_set_edge_list.txt", "")
     graph = CSRGraph.from_edge_list_file(args.instance_path, name=name)
+
+    if args.max_iters is None and args.time_per_attempt is None:
+        args.max_iters = max(1, round(graph.n * args.max_iters_factor))
+        print(f"no --max-iters/--time-per-attempt given: defaulting max_iters to "
+              f"round(n * {args.max_iters_factor:g}) = {args.max_iters}")
+
+    # effort (max_iters or time_per_attempt) is now always resolved, one way or another;
+    # only num_attempts and time_limit can still be unresolved.
+    has_num_attempts = args.num_attempts is not None
+    has_time_limit = args.time_limit is not None
+    n_given = sum([has_num_attempts, has_time_limit])
+
+    if n_given == 0:
+        args.num_attempts = DEFAULT_NUM_ATTEMPTS
+        has_num_attempts = True
+    elif n_given == 2:
+        raise SystemExit(
+            "give at most one of --num-attempts or --time-limit -- the other is derived from "
+            "--max-iters (or --time-per-attempt, or the size-based default)."
+        )
 
     rate = None
     def get_rate():
@@ -90,11 +96,11 @@ def main():
             print(f"calibration: ~{rate:.0f} iters/sec on this graph")
         return rate
 
-    if has_effort and has_num_attempts:
+    if has_num_attempts:
         max_iters = args.max_iters if args.max_iters is not None else max(1, round(get_rate() * args.time_per_attempt))
         num_attempts = args.num_attempts
 
-    elif has_effort and has_time_limit:
+    else:  # has_time_limit
         if args.time_per_attempt is not None:
             if args.time_per_attempt > args.time_limit:
                 raise SystemExit(f"--time-per-attempt={args.time_per_attempt} exceeds --time-limit={args.time_limit}")
@@ -104,11 +110,6 @@ def main():
             max_iters = args.max_iters
             time_per_attempt = max_iters / get_rate()
         num_attempts = max(1, int(args.time_limit // time_per_attempt))
-
-    else:  # has_num_attempts and has_time_limit
-        num_attempts = args.num_attempts
-        time_per_attempt = args.time_limit / num_attempts
-        max_iters = max(1, round(get_rate() * time_per_attempt))
 
     predicted_total = None
     if rate is not None:

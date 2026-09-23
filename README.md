@@ -1,7 +1,6 @@
 # Maximum Stable Set via Petford-Welsh Simulated Annealing
  
-Solves the Maximum Stable Set Problem (MSSP) with a Petford-Welsh-style
-simulated annealing solver. Vertices are 0/1 variables; the energy
+Solves the Maximum Stable Set Problem (MSSP) with a Petford-Welsh-style solver. Vertices are 0/1 variables; the energy
  
 ```
 E(x) = -A * sum(x_v) + B * sum(x_u * x_v for edges {u, v})
@@ -32,10 +31,9 @@ pip install -r requirements.txt
 - `analysis/` — benchmark and sweep scripts built on top of `scripts/`. Some
   predate the current per-attempt `B`/`b` array API and may need updating
   before they run.
-- `instances/` — MSSP instance files as edge lists (`stable_set/` and the
-  BHOSLIB family under `bhoslib/`).
+- `instances/` — MSSP instance files as edge lists.
 - `results/` — CSVs and plots produced by the analysis scripts.
-- `report/` — LaTeX write-up.
+- `report/` — LaTeX report.
 ## Instance file format
  
 Plain text edge-list files, 1-indexed:

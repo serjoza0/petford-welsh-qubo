@@ -1,5 +1,15 @@
+"""Compare Petford-Welsh against a D-Wave simulated-annealing reference.
+
+For every instance under instances/, runs run_multi_start (PW, JIT solver)
+and, unless --skip-sa is given, dwave.samplers.SimulatedAnnealingSampler via
+qpu_comparison as a reference solver. Writes per-instance summary rows to
+results/benchmark_stable_set_results.csv and per-attempt PW detail to
+results/benchmark_stable_set_attempts.csv. --latex additionally writes a
+LaTeX table of the summary to report/benchmark_stable_set_table.tex.
+"""
 import os
 import re
+import time
 import argparse
 import numpy as np
 
@@ -8,11 +18,6 @@ from scripts import *
 
 from dwave.samplers import SimulatedAnnealingSampler
 from qpu_comparison import calculate_best_solution, eliminate_and_recalculate
-
-ITERS_PER_N = 5000
-MIN_ITERS = 2000
-QUICK_ITERS_PER_N = 200
-QUICK_MIN_ITERS = 500
 
 def run_reference_sa(name, num_attempts, base_dir=None):
     nx_graph = load_instance_nx(name, base_dir)
@@ -53,12 +58,11 @@ def main():
 
         print(f"{name:35s} n={graph.n:5d} m={graph.m:7d} "
               f"(A={args.A}, B={args.B}, base={args.base}, "
-              f"max_iters={args.max_iters}, attempts={args.num_attempts}) ... ", end="\n", flush=True)
+              f"max_iters={DEFAULT_MAX_ITERS}, attempts={args.num_attempts}) ... ", end="\n", flush=True)
         
         result = run_multi_start(graph, A=args.A, B=args.B, b=args.base,
-                                 max_iters=ITERS_PER_N * graph.n, num_attempts=args.num_attempts, seed=args.seed,
+                                 max_iters=DEFAULT_MAX_ITERS, num_attempts=args.num_attempts, seed=args.seed,
                                  known_alpha=KNOWN_ALPHA.get(name))
-        print(f"best={result.best:4d} mean={result.mean:7.2f} std={result.std:5.2f} time={result.total_time:6.1f}s")
         results.append(result)
         gap_str = result.gap if result.gap is not None else "?"
         print(f"best={result.best:4d} mean={result.mean:7.2f} std={result.std:5.2f} "
@@ -87,7 +91,7 @@ def main():
     if args.latex:
         import pandas as pd
         df = pd.read_csv(csv_path)
-        df = df.drop(columns=["A", "B", "b", "std"])
+        df = df.drop(columns=["A", "B", "b", "std"], errors="ignore")
         latex_table = df.to_latex(index=False, float_format="%.2f", escape=True)
         with open(os.path.join(base_dir, "report", "benchmark_stable_set_table.tex"), "w") as f:
             f.write(latex_table)

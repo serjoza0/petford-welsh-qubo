@@ -6,45 +6,47 @@ from time import perf_counter
 import numpy as np
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
-from scripts import CSRGraph, petford_welsh_jit, read_edge_list, create_networkx_graph
-
-KNOWN_ALPHA = {
-    "C125.9": 34, "MANN_a9": 16, "brock200-4": 17,
-    "brock800_1": 23, "brock800_2": 24, "brock800_3": 25, "brock800_4": 26,
-    "c-fat200-1": 12, "c-fat200-2": 24, "c-fat200-5": 58,
-    "c-fat500-1": 14, "c-fat500-2": 26, "c-fat500-5": 64,
-    "dsjc125.5": 10, "dsjc125.9": 34,
-    "evil-N120-p98-chv12x10": 20, "evil-N120-p98-myc5x24": 48,
-    "evil-N121-p98-myc11x11": 22, "evil-N125-p98-s3m25x5": 20,
-    "hamming6_2": 32, "hamming6_4": 4,
-    "johnson16_2_4": 8, "johnson8_2_4": 4, "johnson8_4_4": 14,
-    "keller4": 11, "p-hat500-1": 9,
-    "p_hat1500_1": 12, "p_hat1500_2": 65, "p_hat1500_3": 94,
-    "paley101": 5, "paley61": 5, "paley73": 5, "paley89": 5, "paley97": 6,
-    "san200-0-7-1": 30, "san200-0-7-2": 18, "sanr200-0-7": 18,
-}
-# KNOWN_ALPHA = {'frb53-24-1': 53,'frb40-19-1': 40,'frb50-23-2': 50,'frb50-23-5': 50,'frb50-23-4': 50,'frb50-23-3': 50,'frb35-17-3': 35,'frb45-21-4': 45,'frb45-21-3': 45,'frb35-17-4': 35,'frb59-26-5': 59,'frb59-26-2': 59,'frb59-26-3': 59,'frb59-26-4': 59,'frb35-17-5': 35,'frb45-21-2': 45,'frb45-21-5': 45,'frb35-17-2': 35,'frb30-15-4': 30,'frb30-15-3': 30,'frb30-15-2': 30,'frb30-15-5': 30,'frb53-24-2': 53,'frb40-19-3': 40,'frb40-19-4': 40,'frb53-24-5': 53,'frb100-40': 100,'frb53-24-4': 53,'frb40-19-5': 40,'frb40-19-2': 40,'frb53-24-3': 53,'frb50-23-1': 50,'frb59-26-1': 59,'frb35-17-1': 35,'frb45-21-1': 45,'frb30-15-1': 30}
+from scripts.graph import CSRGraph, read_edge_list, create_networkx_graph
+from scripts.solver_jit import petford_welsh_jit
 
 DEFAULT_A = 1
 DEFAULT_B = 2
 DEFAULT_BASE = 8
 DEFAULT_SEED = 0
-DEFAULT_MAX_ITERS = 10000
-DEFAULT_NUM_ATTEMPTS = 50
+DEFAULT_MAX_ITERS = 1000000
+DEFAULT_NUM_ATTEMPTS = 100
 
 ATTEMPT_BUCKETS = [(130, 500), (250, 500), (600, 200), (float("inf"), 100)]
 QUICK_ATTEMPT_BUCKETS = [(130, 5), (250, 5), (600, 3), (float("inf"), 2)]
 
 
+# INSTANCE_SUBDIRS = ["dimacs"]
+INSTANCE_SUBDIRS = ["dimacs", "bhoslib", "PACE", "quantum", "EVIL", "coding_theory"]
+
 def instances_dir(base_dir=None):
-    return os.path.join(base_dir or os.getcwd(), "instances", "stable_set")
+    return os.path.join(base_dir or os.getcwd(), "instances")
+
+def _instance_file_index(base_dir=None):
+    base = instances_dir(base_dir)
+    index = {}
+    for sub in INSTANCE_SUBDIRS:
+        sub_dir = os.path.join(base, sub)
+        if not os.path.isdir(sub_dir):
+            continue
+        for path in sorted(glob.glob(os.path.join(sub_dir, "*_stable_set_edge_list.txt"))):
+            name = os.path.basename(path).replace("_stable_set_edge_list.txt", "")
+            if name not in index:
+                index[name] = path
+    return index
 
 def instance_path(name, base_dir=None):
-    return os.path.join(instances_dir(base_dir), f"{name}_stable_set_edge_list.txt")
+    index = _instance_file_index(base_dir)
+    if name not in index:
+        raise FileNotFoundError(f"no instance named {name!r} found under {instances_dir(base_dir)}")
+    return index[name]
 
 def all_instance_names(base_dir=None):
-    paths = sorted(glob.glob(os.path.join(instances_dir(base_dir), "*.txt")))
-    return [os.path.basename(p).replace("_stable_set_edge_list.txt", "") for p in paths]
+    return sorted(_instance_file_index(base_dir))
 
 def load_instance(name, base_dir=None):
     return CSRGraph.from_edge_list_file(instance_path(name, base_dir), name=name)
@@ -54,11 +56,12 @@ def load_instance_nx(name, base_dir=None):
     return create_networkx_graph(n, edges)
 
 def iter_graphs(names=None, base_dir=None, max_n=None, verbose=True):
-    names = names or all_instance_names(base_dir)
+    index = _instance_file_index(base_dir)
+    names = names or sorted(index)
     total = len(names)
     for idx, name in enumerate(names):
-        path = instance_path(name, base_dir)
-        if not os.path.exists(path):
+        path = index.get(name)
+        if path is None:
             if verbose:
                 print(f"[{idx+1}/{total}] {name}: instance file not found, skipping")
             continue
@@ -119,7 +122,8 @@ def add_instance_arg(parser, default="C125.9"):
 
 def add_instances_arg(parser):
     parser.add_argument("--instances", nargs="+", default=None,
-                         help="specific instance names; default is every instance in instances/stable_set")
+                         help="specific instance names; default is every instance found under "
+                              "instances/ (across all subfolders)")
     return parser
 
 def add_pw_args(parser, default_max_iters=DEFAULT_MAX_ITERS, default_num_attempts=DEFAULT_NUM_ATTEMPTS, default_seed=DEFAULT_SEED):

@@ -1,0 +1,2 @@
+instance,upper_bound,status,n,m,best,mean,std,elapsed_sec,gap,relative_gap
+chv12x10,20,ok,120,545,20,17.08,5.73,1.04,0,0.0000

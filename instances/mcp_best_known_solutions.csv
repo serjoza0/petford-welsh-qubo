@@ -1,0 +1,466 @@
+dataset,instance,file,vertices,best_known,upper_bound
+DIMACS,brock200_1,brock200_1.clq,200,21,21
+DIMACS,brock200_2,brock200_2.clq,200,12,12
+DIMACS,brock200_3,brock200_3.clq,200,15,15
+DIMACS,brock200_4,brock200_4.clq,200,17,17
+DIMACS,brock400_1,brock400_1.clq,400,27,27
+DIMACS,brock400_2,brock400_2.clq,400,29,29
+DIMACS,brock400_3,brock400_3.clq,400,31,31
+DIMACS,brock400_4,brock400_4.clq,400,33,33
+DIMACS,brock800_1,brock800_1.clq,800,23,23
+DIMACS,brock800_2,brock800_2.clq,800,24,24
+DIMACS,brock800_3,brock800_3.clq,800,25,25
+DIMACS,brock800_4,brock800_4.clq,800,26,26
+DIMACS,C125.9,C125.9.clq,125,34,34
+DIMACS,C250.9,C250.9.clq,250,44,44
+DIMACS,C500.9,C500.9.clq,500,57,
+DIMACS,C1000.9,C1000.9.clq,1000,68,
+DIMACS,C2000.5,C2000.5.clq,2000,16,16
+DIMACS,C2000.9,C2000.9.clq,2000,80,
+DIMACS,C4000.5,C4000.5.clq,4000,18,18
+DIMACS,DSJC500.5,DSJC500.5.clq,500,13,13
+DIMACS,DSJC1000.5,DSJC1000.5.clq,1000,15,15
+DIMACS,keller4,keller4.clq,171,11,11
+DIMACS,keller5,keller5.clq,776,27,27
+DIMACS,keller6,keller6.clq,3361,59,59
+DIMACS,MANN_a9,MANN_a9.clq,45,16,16
+DIMACS,MANN_a27,MANN_a27.clq,378,126,126
+DIMACS,MANN_a45,MANN_a45.clq,1035,345,345
+DIMACS,MANN_a81,MANN_a81.clq,3321,1100,1100
+DIMACS,hamming6-2,hamming6-2.clq,64,32,32
+DIMACS,hamming6-4,hamming6-4.clq,64,4,4
+DIMACS,hamming8-2,hamming8-2.clq,256,128,128
+DIMACS,hamming8-4,hamming8-4.clq,256,16,16
+DIMACS,hamming10-2,hamming10-2.clq,1024,512,512
+DIMACS,hamming10-4,hamming10-4.clq,1024,40,40
+DIMACS,gen200-p0.9-44,gen200-p0.9-44.clq,200,44,44
+DIMACS,gen200-p0.9-55,gen200-p0.9-55.clq,200,55,55
+DIMACS,gen400-p0.9-55,gen400-p0.9-55.clq,400,55,55
+DIMACS,gen400-p0.9-65,gen400-p0.9-65.clq,400,65,65
+DIMACS,gen400-p0.9-75,gen400-p0.9-75.clq,400,75,75
+DIMACS,c-fat200-1,c-fat200-1.clq,200,12,12
+DIMACS,c-fat200-2,c-fat200-2.clq,200,24,24
+DIMACS,c-fat200-5,c-fat200-5.clq,200,58,58
+DIMACS,c-fat500-1,c-fat500-1.clq,500,14,14
+DIMACS,c-fat500-2,c-fat500-2.clq,500,26,26
+DIMACS,c-fat500-5,c-fat500-5.clq,500,64,64
+DIMACS,c-fat500-10,c-fat500-10.clq,500,126,126
+DIMACS,johnson8-2-4,johnson8-2-4.clq,28,4,4
+DIMACS,johnson8-4-4,johnson8-4-4.clq,70,14,14
+DIMACS,johnson16-2-4,johnson16-2-4.clq,120,8,8
+DIMACS,johnson32-2-4,johnson32-2-4.clq,496,16,16
+DIMACS,p_hat300-1,p_hat300-1.clq,300,8,8
+DIMACS,p_hat300-2,p_hat300-2.clq,300,25,25
+DIMACS,p_hat300-3,p_hat300-3.clq,300,36,36
+DIMACS,p_hat500-1,p_hat500-1.clq,500,9,9
+DIMACS,p_hat500-2,p_hat500-2.clq,500,36,36
+DIMACS,p_hat500-3,p_hat500-3.clq,500,50,50
+DIMACS,p_hat700-1,p_hat700-1.clq,700,11,11
+DIMACS,p_hat700-2,p_hat700-2.clq,700,44,44
+DIMACS,p_hat700-3,p_hat700-3.clq,700,62,62
+DIMACS,p_hat1000-1,p_hat1000-1.clq,1000,10,10
+DIMACS,p_hat1000-2,p_hat1000-2.clq,1000,46,46
+DIMACS,p_hat1000-3,p_hat1000-3.clq,1000,68,68
+DIMACS,p_hat1500-1,p_hat1500-1.clq,1500,12,12
+DIMACS,p_hat1500-2,p_hat1500-2.clq,1500,65,65
+DIMACS,p_hat1500-3,p_hat1500-3.clq,1500,94,94
+DIMACS,san200_0.7_1,san200_0.7_1.clq,200,30,30
+DIMACS,san200_0.7_2,san200_0.7_2.clq,200,18,18
+DIMACS,san200_0.9_1,san200_0.9_1.clq,200,70,70
+DIMACS,san200_0.9_2,san200_0.9_2.clq,200,60,60
+DIMACS,san200_0.9_3,san200_0.9_3.clq,200,44,44
+DIMACS,san400_0.5_1,san400_0.5_1.clq,400,13,13
+DIMACS,san400_0.7_1,san400_0.7_1.clq,400,40,40
+DIMACS,san400_0.7_2,san400_0.7_2.clq,400,30,30
+DIMACS,san400_0.7_3,san400_0.7_3.clq,400,22,22
+DIMACS,san400_0.9_1,san400_0.9_1.clq,400,100,100
+DIMACS,san1000,san1000.clq,1000,15,15
+DIMACS,sanr200_0.7,sanr200_0.7.clq,200,18,18
+DIMACS,sanr200_0.9,sanr200_0.9.clq,200,42,42
+DIMACS,sanr400_0.5,sanr400_0.5.clq,400,13,13
+DIMACS,sanr400_0.7,sanr400_0.7.clq,400,21,21
+DIMACS,dsjc125.5,dsjc125.5.clq,125,10,10
+DIMACS,dsjc125.9,dsjc125.9.clq,125,34,34
+DIMACS,evil-N120-p98-chv12x10,evil-N120-p98-chv12x10.clq,120,20,20
+DIMACS,evil-N120-p98-myc5x24,evil-N120-p98-myc5x24.clq,120,48,48
+DIMACS,evil-N121-p98-myc11x11,evil-N121-p98-myc11x11.clq,121,22,22
+DIMACS,evil-N125-p98-s3m25x5,evil-N125-p98-s3m25x5.clq,125,20,20
+DIMACS,payley101,payley101.clq,101,5,5
+DIMACS,payley61,payley61.clq,61,5,5
+DIMACS,payley73,payley73.clq,73,5,5
+DIMACS,payley89,payley89.clq,89,5,5
+DIMACS,payley101,payley101.clq,101,
+BHOSLIB,frb30-15-1,frb30-15-1.clq,450,30,30
+BHOSLIB,frb30-15-2,frb30-15-2.clq,450,30,30
+BHOSLIB,frb30-15-3,frb30-15-3.clq,450,30,30
+BHOSLIB,frb30-15-4,frb30-15-4.clq,450,30,30
+BHOSLIB,frb30-15-5,frb30-15-5.clq,450,30,30
+BHOSLIB,frb35-17-1,frb35-17-1.clq,595,35,35
+BHOSLIB,frb35-17-2,frb35-17-2.clq,595,35,35
+BHOSLIB,frb35-17-3,frb35-17-3.clq,595,35,35
+BHOSLIB,frb35-17-4,frb35-17-4.clq,595,35,35
+BHOSLIB,frb35-17-5,frb35-17-5.clq,595,35,35
+BHOSLIB,frb40-19-1,frb40-19-1.clq,760,40,40
+BHOSLIB,frb40-19-2,frb40-19-2.clq,760,40,40
+BHOSLIB,frb40-19-3,frb40-19-3.clq,760,40,40
+BHOSLIB,frb40-19-4,frb40-19-4.clq,760,40,40
+BHOSLIB,frb40-19-5,frb40-19-5.clq,760,40,40
+BHOSLIB,frb45-21-1,frb45-21-1.clq,945,45,45
+BHOSLIB,frb45-21-2,frb45-21-2.clq,945,45,45
+BHOSLIB,frb45-21-3,frb45-21-3.clq,945,45,45
+BHOSLIB,frb45-21-4,frb45-21-4.clq,945,45,45
+BHOSLIB,frb45-21-5,frb45-21-5.clq,945,45,45
+BHOSLIB,frb50-23-1,frb50-23-1.clq,1150,50,50
+BHOSLIB,frb50-23-2,frb50-23-2.clq,1150,50,50
+BHOSLIB,frb50-23-3,frb50-23-3.clq,1150,50,50
+BHOSLIB,frb50-23-4,frb50-23-4.clq,1150,50,50
+BHOSLIB,frb50-23-5,frb50-23-5.clq,1150,50,50
+BHOSLIB,frb53-24-1,frb53-24-1.clq,1272,53,53
+BHOSLIB,frb53-24-2,frb53-24-2.clq,1272,53,53
+BHOSLIB,frb53-24-3,frb53-24-3.clq,1272,53,53
+BHOSLIB,frb53-24-4,frb53-24-4.clq,1272,53,53
+BHOSLIB,frb53-24-5,frb53-24-5.clq,1272,53,53
+BHOSLIB,frb56-25-1,frb56-25-1.clq,1400,56,56
+BHOSLIB,frb56-25-2,frb56-25-2.clq,1400,56,56
+BHOSLIB,frb56-25-3,frb56-25-3.clq,1400,56,56
+BHOSLIB,frb56-25-4,frb56-25-4.clq,1400,56,56
+BHOSLIB,frb56-25-5,frb56-25-5.clq,1400,56,56
+BHOSLIB,frb59-26-1,frb59-26-1.clq,1534,59,59
+BHOSLIB,frb59-26-2,frb59-26-2.clq,1534,59,59
+BHOSLIB,frb59-26-3,frb59-26-3.clq,1534,59,59
+BHOSLIB,frb59-26-4,frb59-26-4.clq,1534,59,59
+BHOSLIB,frb59-26-5,frb59-26-5.clq,1534,59,59
+EVIL,chv12x10,evil2/evil-tests/evil-N120-p98-chv12x10.clq,120,20,20
+EVIL,myc5x24,evil2/evil-tests/evil-N120-p98-myc5x24.clq,120,48,48
+EVIL,myc11x11,evil2/evil-tests/evil-N121-p98-myc11x11.clq,121,22,22
+EVIL,s3m25x5,evil2/evil-tests/evil-N125-p98-s3m25x5.clq,125,20,20
+EVIL,myc23x6,evil2/evil-tests/evil-N138-p98-myc23x6.clq,138,12,12
+EVIL,myc5x30,evil2/evil-tests/evil-N150-p98-myc5x30.clq,150,60,60
+EVIL,s3m25x6,evil2/evil-tests/evil-N150-p98-s3m25x6.clq,150,24,24
+EVIL,myc11x14,evil2/evil-tests/evil-N154-p98-myc11x14.clq,154,28,28
+EVIL,chv12x15,evil2/evil-tests/evil-N180-p98-chv12x15.clq,180,30,30
+EVIL,myc5x36,evil2/evil-tests/evil-N180-p98-myc5x36.clq,180,72,72
+EVIL,myc23x8,evil2/evil-tests/evil-N184-p98-myc23x8.clq,184,16,16
+EVIL,myc11x17,evil2/evil-tests/evil-N187-p98-myc11x17.clq,187,34,34
+EVIL,s3m25x8,evil2/evil-tests/evil-N200-p98-s3m25x8.clq,200,32,32
+EVIL,myc5x42,evil2/evil-tests/evil-N210-p98-myc5x42.clq,210,84,84
+EVIL,myc11x20,evil2/evil-tests/evil-N220-p98-myc11x20.clq,220,40,40
+EVIL,myc23x10,evil2/evil-tests/evil-N230-p98-myc23x10.clq,230,20,20
+EVIL,chv12x20,evil2/evil-tests/evil-N240-p98-chv12x20.clq,240,40,40
+EVIL,myc5x48,evil2/evil-tests/evil-N240-p98-myc5x48.clq,240,96,96
+EVIL,s3m25x10,evil2/evil-tests/evil-N250-p98-s3m25x10.clq,250,40,40
+EVIL,myc11x23,evil2/evil-tests/evil-N253-p98-myc11x23.clq,253,46,46
+EVIL,chv12x30,evil2/evil-tests/evil-N360-p98-chv12x30.clq,360,60,60
+EVIL,chv12x40,evil2/evil-tests/evil-N480-p98-chv12x40.clq,480,80,80
+EVIL,chv12x60,evil2/evil-tests/evil-N720-p98-chv12x60.clq,720,120,120
+EVIL,myc5x60,evil2/evil-tests/evil-N300-p98-myc5x60.clq,300,120,120
+EVIL,myc5x80,evil2/evil-tests/evil-N400-p98-myc5x80.clq,400,160,160
+EVIL,myc5x100,evil2/evil-tests/evil-N500-p98-myc5x100.clq,500,200,200
+EVIL,myc5x120,evil2/evil-tests/evil-N600-p98-myc5x120.clq,600,240,240
+EVIL,myc5x140,evil2/evil-tests/evil-N700-p98-myc5x140.clq,700,280,280
+EVIL,myc11x30,evil2/evil-tests/evil-N330-p98-myc11x30.clq,330,60,60
+EVIL,myc11x40,evil2/evil-tests/evil-N440-p98-myc11x40.clq,440,80,80
+EVIL,myc11x50,evil2/evil-tests/evil-N550-p98-myc11x50.clq,550,100,100
+EVIL,myc11x60,evil2/evil-tests/evil-N660-p98-myc11x60.clq,660,120,120
+EVIL,myc23x15,evil2/evil-tests/evil-N345-p98-myc23x15.clq,345,30,30
+EVIL,myc23x20,evil2/evil-tests/evil-N460-p98-myc23x20.clq,460,40,40
+EVIL,myc23x25,evil2/evil-tests/evil-N575-p98-myc23x25.clq,575,50,50
+EVIL,myc23x30,evil2/evil-tests/evil-N690-p98-myc23x30.clq,690,60,60
+EVIL,s3m25x15,evil2/evil-tests/evil-N375-p98-s3m25x15.clq,375,60,60
+EVIL,s3m25x20,evil2/evil-tests/evil-N500-p98-s3m25x20.clq,500,80,80
+EVIL,s3m25x25,evil2/evil-tests/evil-N625-p98-s3m25x25.clq,625,100,100
+EVIL,s3m25x30,evil2/evil-tests/evil-N750-p98-s3m25x30.clq,750,120,120
+Coding theory,1dc.64,a265032_1dc.64.txt.gz (OEIS),64,10,10
+Coding theory,1dc.128,a265032_1dc.128.txt.gz (OEIS),128,16,16
+Coding theory,1dc.256,a265032_1dc.256.txt.gz (OEIS),256,30,30
+Coding theory,1dc.512,a265032_1dc.512.txt.gz (OEIS),512,52,52
+Coding theory,1dc.1024,a265032_1dc.1024.txt.gz (OEIS),1024,94,94
+Coding theory,1dc.2048,a265032_1dc.2048.txt.gz (OEIS),2048,172,174
+Coding theory,2dc.128,a265032_2dc.128.txt.gz (OEIS),128,5,5
+Coding theory,2dc.256,a265032_2dc.256.txt.gz (OEIS),256,7,7
+Coding theory,2dc.512,a265032_2dc.512.txt.gz (OEIS),512,11,11
+Coding theory,2dc.1024,a265032_2dc.1024.txt.gz (OEIS),1024,16,16
+Coding theory,2dc.2048,a265032_2dc.2048.txt.gz (OEIS),2048,24,24
+Coding theory,1tc.8,a265032_1tc.8.txt.gz (OEIS),8,4,4
+Coding theory,1tc.16,a265032_1tc.16.txt.gz (OEIS),16,8,8
+Coding theory,1tc.32,a265032_1tc.32.txt.gz (OEIS),32,12,12
+Coding theory,1tc.64,a265032_1tc.64.txt.gz (OEIS),64,20,20
+Coding theory,1tc.128,a265032_1tc.128.txt.gz (OEIS),128,38,38
+Coding theory,1tc.256,a265032_1tc.256.txt.gz (OEIS),256,63,63
+Coding theory,1tc.512,a265032_1tc.512.txt.gz (OEIS),512,110,110
+Coding theory,1tc.1024,a265032_1tc.1024.txt.gz (OEIS),1024,196,196
+Coding theory,1tc.2048,a265032_1tc.2048.txt.gz (OEIS),2048,352,352
+Coding theory,1et.64,a265032_1et.64.txt.gz (OEIS),64,18,18
+Coding theory,1et.128,a265032_1et.128.txt.gz (OEIS),128,28,28
+Coding theory,1et.256,a265032_1et.256.txt.gz (OEIS),256,50,50
+Coding theory,1et.512,a265032_1et.512.txt.gz (OEIS),512,100,100
+Coding theory,1et.1024,a265032_1et.1024.txt.gz (OEIS),1024,171,171
+Coding theory,1et.2048,a265032_1et.2048.txt.gz (OEIS),2048,316,316
+Coding theory,1zc.128,a265032_1zc.128.txt.gz (OEIS),128,18,18
+Coding theory,1zc.256,a265032_1zc.256.txt.gz (OEIS),256,36,36
+Coding theory,1zc.512,a265032_1zc.512.txt.gz (OEIS),512,62,62
+Coding theory,1zc.1024,a265032_1zc.1024.txt.gz (OEIS),1024,112,117
+Coding theory,1zc.2048,a265032_1zc.2048.txt.gz (OEIS),2048,198,210
+Coding theory,1zc.4096,a265032_1zc.4096.txt.gz (OEIS),4096,379,410
+Quantum,g136x6,qbenchmarks/evil-N60-p98-g136x6.clq,60,48,48
+Quantum,g136x8,qbenchmarks/evil-N80-p98-g136x8.clq,80,64,64
+Quantum,g136x10,qbenchmarks/evil-N100-p98-g136x10.clq,100,80,80
+Quantum,g136x12,qbenchmarks/evil-N120-p98-g136x12.clq,120,96,96
+Quantum,g150x6,qbenchmarks/evil-N60-p98-g150x6.clq,60,54,54
+Quantum,g150x8,qbenchmarks/evil-N80-p98-g150x8.clq,80,72,72
+Quantum,g32559x6,qbenchmarks/evil-N66-p98-g32559x6.clq,66,48,48
+Quantum,g32559x8,qbenchmarks/evil-N88-p98-g32559x8.clq,88,64,64
+Quantum,g32559x10,qbenchmarks/evil-N110-p98-g32559x10.clq,110,80,80
+Quantum,g32565x6,qbenchmarks/evil-N66-p98-g32565x6.clq,66,42,42
+Quantum,g32565x8,qbenchmarks/evil-N88-p98-g32565x8.clq,88,56,56
+Quantum,g32565x10,qbenchmarks/evil-N110-p98-g32565x10.clq,110,70,70
+Quantum,g33896x4,qbenchmarks/evil-N72-p98-g33896x4.clq,72,28,28
+Quantum,g33896x5,qbenchmarks/evil-N90-p98-g33896x5.clq,90,35,35
+Quantum,g33896x6,qbenchmarks/evil-N108-p98-g33896x6.clq,108,42,42
+Quantum,g33896x7,qbenchmarks/evil-N126-p98-g33896x7.clq,126,49,49
+Quantum,g33918x4,qbenchmarks/evil-N72-p98-g33918x4.clq,72,28,28
+Quantum,g33918x5,qbenchmarks/evil-N90-p98-g33918x5.clq,90,35,35
+Quantum,g33918x6,qbenchmarks/evil-N108-p98-g33918x6.clq,108,42,42
+Quantum,g33918x7,qbenchmarks/evil-N126-p98-g33918x7.clq,126,49,49
+Quantum,g33920x4,qbenchmarks/evil-N76-p98-g33920x4.clq,76,32,32
+Quantum,g33920x5,qbenchmarks/evil-N95-p98-g33920x5.clq,95,40,40
+Quantum,g33920x6,qbenchmarks/evil-N114-p98-g33920x6.clq,114,48,48
+Quantum,g50634x3,qbenchmarks/evil-N60-p98-g50634x3.clq,60,30,30
+Quantum,g50634x4,qbenchmarks/evil-N80-p98-g50634x4.clq,80,40,40
+Quantum,g50634x5,qbenchmarks/evil-N100-p98-g50634x5.clq,100,50,50
+Quantum,g50634x6,qbenchmarks/evil-N120-p98-g50634x6.clq,120,60,60
+Quantum,1dc.64-c,qbenchmarks/a265032_1dc.64-c.clq,64,10,10
+Quantum,1dc.128-c,,128,16,16
+Quantum,2dc.128-c,qbenchmarks/a265032_2dc.128-c.clq,128,5,5
+Quantum,1tc.64-c,qbenchmarks/a265032_1tc.64-c.clq,64,20,20
+Quantum,1tc.128-c,qbenchmarks/a265032_1tc.128-c.clq,128,38,38
+Quantum,1et.64-c,qbenchmarks/a265032_1et.64-c.clq,64,18,18
+Quantum,1et.128-c,qbenchmarks/a265032_1et.128-c.clq,128,28,28
+Quantum,1zc.128-c,qbenchmarks/a265032_1zc.128-c.clq,128,18,18
+Quantum,chv12x5,qbenchmarks/evil-N60-p98-chv12x5.clq,60,10,10
+Quantum,chv12x6,qbenchmarks/evil-N72-p98-chv12x6.clq,72,12,12
+Quantum,chv12x7,qbenchmarks/evil-N84-p98-chv12x7.clq,84,14,14
+Quantum,chv12x8,qbenchmarks/evil-N96-p98-chv12x8.clq,96,16,16
+Quantum,chv12x9,qbenchmarks/evil-N108-p98-chv12x9.clq,108,18,18
+Quantum,myc5x12,qbenchmarks/evil-N60-p98-myc5x12.clq,60,24,24
+Quantum,myc5x16,qbenchmarks/evil-N80-p98-myc5x16.clq,80,32,32
+Quantum,myc5x20,qbenchmarks/evil-N100-p98-myc5x20.clq,100,40,40
+Quantum,myc11x5,qbenchmarks/evil-N55-p98-myc11x5.clq,55,10,10
+Quantum,myc11x7,qbenchmarks/evil-N77-p98-myc11x7.clq,77,14,14
+Quantum,myc11x9,qbenchmarks/evil-N99-p98-myc11x9.clq,99,18,18
+Quantum,myc23x3,qbenchmarks/evil-N69-p98-myc23x3.clq,69,6,6
+Quantum,myc23x4,qbenchmarks/evil-N92-p98-myc23x4.clq,92,8,8
+Quantum,myc23x5,qbenchmarks/evil-N115-p98-myc23x5.clq,115,10,10
+Quantum,s3m25x2,qbenchmarks/evil-N50-p98-s3m25x2.clq,50,8,8
+Quantum,s3m25x3,qbenchmarks/evil-N75-p98-s3m25x3.clq,75,12,12
+Quantum,s3m25x4,qbenchmarks/evil-N100-p98-s3m25x4.clq,100,16,16
+Quantum,s3m25x5,qbenchmarks/evil-N125-p98-s3m25x5.clq,125,20,20
+Quantum,C125.9,qbenchmarks/C125.9.clq,125,34,34
+Quantum,hamming6-2,qbenchmarks/hamming6-2.clq,64,32,32
+Quantum,hamming6-4,qbenchmarks/hamming6-4.clq,64,4,4
+Quantum,johnson8-4-4,qbenchmarks/johnson8-4-4.clq,70,14,14
+Quantum,johnson16-2-4,qbenchmarks/johnson16-2-4.clq,120,8,8
+Quantum,g150x10,qbenchmarks/evil-N100-p98-g150x10.clq,100,90,90
+Quantum,chv12x10,qbenchmarks/evil-N120-p98-chv12x10.clq,120,20,20
+Quantum,myc5x24,qbenchmarks/evil-N120-p98-myc5x24.clq,120,48,48
+Quantum,myc11x11,qbenchmarks/evil-N121-p98-myc11x11.clq,121,22,22
+PACE 2019,vc-exact_001,vc-exact_001.gr,6160,3574,3574
+PACE 2019,vc-exact_002,vc-exact_002.gr,51795,41190,41190
+PACE 2019,vc-exact_003,vc-exact_003.gr,60541,48351,48351
+PACE 2019,vc-exact_004,vc-exact_004.gr,8114,5540,5540
+PACE 2019,vc-exact_005,vc-exact_005.gr,200,71,71
+PACE 2019,vc-exact_006,vc-exact_006.gr,200,74,74
+PACE 2019,vc-exact_007,vc-exact_007.gr,8794,4397,4397
+PACE 2019,vc-exact_008,vc-exact_008.gr,7537,4192,4192
+PACE 2019,vc-exact_009,vc-exact_009.gr,38452,17104,17104
+PACE 2019,vc-exact_010,vc-exact_010.gr,199,72,72
+PACE 2019,vc-exact_011,vc-exact_011.gr,9877,4896,4896
+PACE 2019,vc-exact_012,vc-exact_012.gr,53444,42526,42526
+PACE 2019,vc-exact_013,vc-exact_013.gr,45307,36697,36697
+PACE 2019,vc-exact_014,vc-exact_014.gr,25123,20012,20012
+PACE 2019,vc-exact_015,vc-exact_015.gr,53610,42940,42940
+PACE 2019,vc-exact_016,vc-exact_016.gr,153,25,25
+PACE 2019,vc-exact_017,vc-exact_017.gr,23541,11459,11459
+PACE 2019,vc-exact_018,vc-exact_018.gr,49212,39011,39011
+PACE 2019,vc-exact_019,vc-exact_019.gr,200,70,70
+PACE 2019,vc-exact_020,vc-exact_020.gr,57287,45639,45639
+PACE 2019,vc-exact_021,vc-exact_021.gr,24765,19655,19655
+PACE 2019,vc-exact_022,vc-exact_022.gr,12589,5840,5840
+PACE 2019,vc-exact_023,vc-exact_023.gr,27717,11704,11704
+PACE 2019,vc-exact_024,vc-exact_024.gr,7620,3256,3256
+PACE 2019,vc-exact_025,vc-exact_025.gr,23194,18295,18295
+PACE 2019,vc-exact_026,vc-exact_026.gr,6140,3634,3634
+PACE 2019,vc-exact_027,vc-exact_027.gr,65866,52435,52435
+PACE 2019,vc-exact_028,vc-exact_028.gr,54991,43780,43780
+PACE 2019,vc-exact_029,vc-exact_029.gr,13431,6809,6809
+PACE 2019,vc-exact_030,vc-exact_030.gr,62853,49515,49515
+PACE 2019,vc-exact_031,vc-exact_031.gr,200,64,64
+PACE 2019,vc-exact_032,vc-exact_032.gr,1490,530,530
+PACE 2019,vc-exact_033,vc-exact_033.gr,4410,1685,1685
+PACE 2019,vc-exact_034,vc-exact_034.gr,1490,530,530
+PACE 2019,vc-exact_035,vc-exact_035.gr,200,67,67
+PACE 2019,vc-exact_036,vc-exact_036.gr,26300,10000,10000
+PACE 2019,vc-exact_037,vc-exact_037.gr,198,67,67
+PACE 2019,vc-exact_038,vc-exact_038.gr,786,181,181
+PACE 2019,vc-exact_039,vc-exact_039.gr,6795,2595,2595
+PACE 2019,vc-exact_040,vc-exact_040.gr,210,65,65
+PACE 2019,vc-exact_041,vc-exact_041.gr,200,61,61
+PACE 2019,vc-exact_042,vc-exact_042.gr,200,64,64
+PACE 2019,vc-exact_043,vc-exact_043.gr,200,61,61
+PACE 2019,vc-exact_044,vc-exact_044.gr,200,58,58
+PACE 2019,vc-exact_045,vc-exact_045.gr,200,63,63
+PACE 2019,vc-exact_046,vc-exact_046.gr,200,63,63
+PACE 2019,vc-exact_047,vc-exact_047.gr,200,60,60
+PACE 2019,vc-exact_048,vc-exact_048.gr,200,62,62
+PACE 2019,vc-exact_049,vc-exact_049.gr,200,64,64
+PACE 2019,vc-exact_050,vc-exact_050.gr,200,60,60
+PACE 2019,vc-exact_051,vc-exact_051.gr,200,60,60
+PACE 2019,vc-exact_052,vc-exact_052.gr,200,62,62
+PACE 2019,vc-exact_053,vc-exact_053.gr,200,61,61
+PACE 2019,vc-exact_054,vc-exact_054.gr,200,63,63
+PACE 2019,vc-exact_055,vc-exact_055.gr,200,66,66
+PACE 2019,vc-exact_056,vc-exact_056.gr,200,59,59
+PACE 2019,vc-exact_057,vc-exact_057.gr,200,58,58
+PACE 2019,vc-exact_058,vc-exact_058.gr,200,58,58
+PACE 2019,vc-exact_059,vc-exact_059.gr,200,63,63
+PACE 2019,vc-exact_060,vc-exact_060.gr,200,59,59
+PACE 2019,vc-exact_061,vc-exact_061.gr,200,65,65
+PACE 2019,vc-exact_062,vc-exact_062.gr,199,58,58
+PACE 2019,vc-exact_063,vc-exact_063.gr,200,62,62
+PACE 2019,vc-exact_064,vc-exact_064.gr,200,62,62
+PACE 2019,vc-exact_065,vc-exact_065.gr,200,62,62
+PACE 2019,vc-exact_066,vc-exact_066.gr,200,66,66
+PACE 2019,vc-exact_067,vc-exact_067.gr,200,57,57
+PACE 2019,vc-exact_068,vc-exact_068.gr,200,65,65
+PACE 2019,vc-exact_069,vc-exact_069.gr,200,60,60
+PACE 2019,vc-exact_070,vc-exact_070.gr,200,67,67
+PACE 2019,vc-exact_071,vc-exact_071.gr,200,64,64
+PACE 2019,vc-exact_072,vc-exact_072.gr,200,60,60
+PACE 2019,vc-exact_073,vc-exact_073.gr,200,61,61
+PACE 2019,vc-exact_074,vc-exact_074.gr,200,68,68
+PACE 2019,vc-exact_075,vc-exact_075.gr,26300,10000,10000
+PACE 2019,vc-exact_076,vc-exact_076.gr,26300,10000,10000
+PACE 2019,vc-exact_077,vc-exact_077.gr,200,63,63
+PACE 2019,vc-exact_078,vc-exact_078.gr,11349,4334,4334
+PACE 2019,vc-exact_079,vc-exact_079.gr,26300,10000,10000
+PACE 2019,vc-exact_080,vc-exact_080.gr,26300,10000,10000
+PACE 2019,vc-exact_081,vc-exact_081.gr,199,58,58
+PACE 2019,vc-exact_082,vc-exact_082.gr,200,62,62
+PACE 2019,vc-exact_083,vc-exact_083.gr,200,56,56
+PACE 2019,vc-exact_084,vc-exact_084.gr,13590,5190,5190
+PACE 2019,vc-exact_085,vc-exact_085.gr,11470,4436,4436
+PACE 2019,vc-exact_086,vc-exact_086.gr,26300,10000,10000
+PACE 2019,vc-exact_087,vc-exact_087.gr,13590,5190,5190
+PACE 2019,vc-exact_088,vc-exact_088.gr,26300,10000,10000
+PACE 2019,vc-exact_089,vc-exact_089.gr,57316,23178,23178
+PACE 2019,vc-exact_090,vc-exact_090.gr,11349,4334,4334
+PACE 2019,vc-exact_091,vc-exact_091.gr,200,55,55
+PACE 2019,vc-exact_092,vc-exact_092.gr,450,30,30
+PACE 2019,vc-exact_093,vc-exact_093.gr,200,57,57
+PACE 2019,vc-exact_094,vc-exact_094.gr,5960,2120,2120
+PACE 2019,vc-exact_095,vc-exact_095.gr,15783,6028,6028
+PACE 2019,vc-exact_096,vc-exact_096.gr,26300,10000,10000
+PACE 2019,vc-exact_097,vc-exact_097.gr,18096,6911,6911
+PACE 2019,vc-exact_098,vc-exact_098.gr,26300,10000,10000
+PACE 2019,vc-exact_099,vc-exact_099.gr,26300,10000,10000
+PACE 2019,vc-exact_100,vc-exact_100.gr,26300,10000,10000
+PACE 2019,vc-exact_101,vc-exact_101.gr,26300,10000,10000
+PACE 2019,vc-exact_102,vc-exact_102.gr,26300,10000,10000
+PACE 2019,vc-exact_103,vc-exact_103.gr,15783,6028,6028
+PACE 2019,vc-exact_104,vc-exact_104.gr,26300,10000,10000
+PACE 2019,vc-exact_105,vc-exact_105.gr,26300,10000,10000
+PACE 2019,vc-exact_106,vc-exact_106.gr,2980,1060,1060
+PACE 2019,vc-exact_107,vc-exact_107.gr,13590,5190,5190
+PACE 2019,vc-exact_108,vc-exact_108.gr,26300,10000,10000
+PACE 2019,vc-exact_109,vc-exact_109.gr,66992,27110,27110
+PACE 2019,vc-exact_110,vc-exact_110.gr,98128,36587,36587
+PACE 2019,vc-exact_111,vc-exact_111.gr,450,30,30
+PACE 2019,vc-exact_112,vc-exact_112.gr,18096,6911,6911
+PACE 2019,vc-exact_113,vc-exact_113.gr,26300,10000,10000
+PACE 2019,vc-exact_114,vc-exact_114.gr,15783,6028,6028
+PACE 2019,vc-exact_115,vc-exact_115.gr,18096,6911,6911
+PACE 2019,vc-exact_116,vc-exact_116.gr,26300,10000,10000
+PACE 2019,vc-exact_117,vc-exact_117.gr,18096,6911,6911
+PACE 2019,vc-exact_118,vc-exact_118.gr,26300,10000,10000
+PACE 2019,vc-exact_119,vc-exact_119.gr,18096,6911,6911
+PACE 2019,vc-exact_120,vc-exact_120.gr,70144,26038,26038
+PACE 2019,vc-exact_121,vc-exact_121.gr,18096,6911,6911
+PACE 2019,vc-exact_122,vc-exact_122.gr,26300,10000,10000
+PACE 2019,vc-exact_123,vc-exact_123.gr,26300,10000,10000
+PACE 2019,vc-exact_124,vc-exact_124.gr,26300,10000,10000
+PACE 2019,vc-exact_125,vc-exact_125.gr,26300,10000,10000
+PACE 2019,vc-exact_126,vc-exact_126.gr,18096,6911,6911
+PACE 2019,vc-exact_127,vc-exact_127.gr,18096,6911,6911
+PACE 2019,vc-exact_128,vc-exact_128.gr,26300,10000,10000
+PACE 2019,vc-exact_129,vc-exact_129.gr,15783,6028,6028
+PACE 2019,vc-exact_130,vc-exact_130.gr,26300,10000,10000
+PACE 2019,vc-exact_131,vc-exact_131.gr,2980,1060,1060
+PACE 2019,vc-exact_132,vc-exact_132.gr,15783,6028,6028
+PACE 2019,vc-exact_133,vc-exact_133.gr,15783,6028,6028
+PACE 2019,vc-exact_134,vc-exact_134.gr,26300,10000,10000
+PACE 2019,vc-exact_135,vc-exact_135.gr,26300,10000,10000
+PACE 2019,vc-exact_136,vc-exact_136.gr,18096,6911,6911
+PACE 2019,vc-exact_137,vc-exact_137.gr,26300,10000,10000
+PACE 2019,vc-exact_138,vc-exact_138.gr,18096,6911,6911
+PACE 2019,vc-exact_139,vc-exact_139.gr,18096,6911,6911
+PACE 2019,vc-exact_140,vc-exact_140.gr,26300,10000,10000
+PACE 2019,vc-exact_141,vc-exact_141.gr,18096,6911,6911
+PACE 2019,vc-exact_142,vc-exact_142.gr,2980,1060,1060
+PACE 2019,vc-exact_143,vc-exact_143.gr,18096,6911,6911
+PACE 2019,vc-exact_144,vc-exact_144.gr,26300,10000,10000
+PACE 2019,vc-exact_145,vc-exact_145.gr,18096,6911,6911
+PACE 2019,vc-exact_146,vc-exact_146.gr,26300,10000,10000
+PACE 2019,vc-exact_147,vc-exact_147.gr,18096,6911,6911
+PACE 2019,vc-exact_148,vc-exact_148.gr,26300,10000,10000
+PACE 2019,vc-exact_149,vc-exact_149.gr,26300,10000,10000
+PACE 2019,vc-exact_150,vc-exact_150.gr,26300,10000,10000
+PACE 2019,vc-exact_151,vc-exact_151.gr,15783,6028,6028
+PACE 2019,vc-exact_152,vc-exact_152.gr,13590,5190,5190
+PACE 2019,vc-exact_153,vc-exact_153.gr,29076,11083,11083
+PACE 2019,vc-exact_154,vc-exact_154.gr,15783,6028,6028
+PACE 2019,vc-exact_155,vc-exact_155.gr,26300,10000,10000
+PACE 2019,vc-exact_156,vc-exact_156.gr,450,30,30
+PACE 2019,vc-exact_157,vc-exact_157.gr,2980,1060,1060
+PACE 2019,vc-exact_158,vc-exact_158.gr,15783,6028,6028
+PACE 2019,vc-exact_159,vc-exact_159.gr,18096,6911,6911
+PACE 2019,vc-exact_160,vc-exact_160.gr,18096,6911,6911
+PACE 2019,vc-exact_161,vc-exact_161.gr,138141,51496,51496
+PACE 2019,vc-exact_162,vc-exact_162.gr,50635,18900,18900
+PACE 2019,vc-exact_163,vc-exact_163.gr,18096,6911,6911
+PACE 2019,vc-exact_164,vc-exact_164.gr,29296,11154,11154
+PACE 2019,vc-exact_165,vc-exact_165.gr,18096,6911,6911
+PACE 2019,vc-exact_166,vc-exact_166.gr,3278,1166,1166
+PACE 2019,vc-exact_167,vc-exact_167.gr,15783,6028,6028
+PACE 2019,vc-exact_168,vc-exact_168.gr,2980,1060,1060
+PACE 2019,vc-exact_169,vc-exact_169.gr,4768,1696,1696
+PACE 2019,vc-exact_170,vc-exact_170.gr,15783,6028,6028
+PACE 2019,vc-exact_171,vc-exact_171.gr,18096,6911,6911
+PACE 2019,vc-exact_172,vc-exact_172.gr,4025,1410,1410
+PACE 2019,vc-exact_173,vc-exact_173.gr,56860,23004,23004
+PACE 2019,vc-exact_174,vc-exact_174.gr,2980,1060,1060
+PACE 2019,vc-exact_175,vc-exact_175.gr,3523,1241,1241
+PACE 2019,vc-exact_176,vc-exact_176.gr,15783,6028,6028
+PACE 2019,vc-exact_177,vc-exact_177.gr,5066,1802,1802
+PACE 2019,vc-exact_178,vc-exact_178.gr,18096,6911,6911
+PACE 2019,vc-exact_179,vc-exact_179.gr,15783,6028,6028
+PACE 2019,vc-exact_180,vc-exact_180.gr,15783,6028,6028
+PACE 2019,vc-exact_181,vc-exact_181.gr,18096,6911,6911
+PACE 2019,vc-exact_182,vc-exact_182.gr,26300,10000,10000
+PACE 2019,vc-exact_183,vc-exact_183.gr,72420,27082,27082
+PACE 2019,vc-exact_184,vc-exact_184.gr,6290,2210,2210
+PACE 2019,vc-exact_185,vc-exact_185.gr,3523,1241,1241
+PACE 2019,vc-exact_186,vc-exact_186.gr,26300,10000,10000
+PACE 2019,vc-exact_187,vc-exact_187.gr,4227,1489,1489
+PACE 2019,vc-exact_188,vc-exact_188.gr,6660,2340,2340
+PACE 2019,vc-exact_189,vc-exact_189.gr,7400,2600,2600
+PACE 2019,vc-exact_190,vc-exact_190.gr,3875,1365,1365
+PACE 2019,vc-exact_191,vc-exact_191.gr,4579,1613,1613
+PACE 2019,vc-exact_192,vc-exact_192.gr,2980,1060,1060
+PACE 2019,vc-exact_193,vc-exact_193.gr,7030,2470,2470
+PACE 2019,vc-exact_194,vc-exact_194.gr,1150,50,50
+PACE 2019,vc-exact_195,vc-exact_195.gr,1150,50,50
+PACE 2019,vc-exact_196,vc-exact_196.gr,1534,59,59
+PACE 2019,vc-exact_197,vc-exact_197.gr,1534,59,59
+PACE 2019,vc-exact_198,vc-exact_198.gr,1150,50,50
+PACE 2019,vc-exact_199,vc-exact_199.gr,1534,59,59
+PACE 2019,vc-exact_200,vc-exact_200.gr,1150,50,50

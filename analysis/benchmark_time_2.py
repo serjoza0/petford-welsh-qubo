@@ -1,18 +1,25 @@
+"""Sweep PW's max_iters and plot per-attempt time vs. solution quality.
+
+For one instance, runs run_multi_start at each --max-iters value, and
+boxplots the optimality gap (known_alpha - best_value, or best_value if
+known_alpha is unset) of every attempt against that level's average
+wall-clock time per attempt, on a log time axis, one box per max_iters
+level. Unless --skip-sa is given, also runs a D-Wave SimulatedAnnealingSampler
+reference (via run_sa_attempts) and overlays its (time, gap) points in red.
+Saves the figure to results/time_to_best_vs_gap_<instance>_maxiters_sweep.png.
+"""
 import os
 import argparse
 import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
-from matplotlib.patches import Patch
 from matplotlib.colors import LogNorm, Normalize
 
 from benchmark_common import *
 from scripts import *
 
-from dwave.samplers import SimulatedAnnealingSampler
-
-DEFAULT_MAX_ITERS = [5000, 20000, 100000, 500000, 2000000, 10000000, 50000000, 100000000, 200000000, 500000000]
+DEFAULT_MAX_ITERS = [5000, 20000, 100000, 500000, 2000000, 10000000, 50000000, 100000000]
 SA_BETA = 0.5
 BOX_WIDTH_FRAC = 0.15
 
@@ -58,6 +65,7 @@ def main():
 
     sa_points = []
     if not args.skip_sa:
+        from dwave.samplers import SimulatedAnnealingSampler
         sampler = SimulatedAnnealingSampler()
         nx_graph = load_instance_nx(name, base_dir)
         sa_points = run_sa_attempts(nx_graph, args.num_attempts, SA_BETA, sampler)
@@ -115,11 +123,10 @@ def main():
     cbar = fig.colorbar(sm, ax=ax)
     cbar.set_label("max_iters")
 
-    handles = [
-    ]
     if sa_points:
-        handles.append(Line2D([0], [0], marker="^", color="w", markerfacecolor="crimson", markersize=8, label="SA (reference)"))
-    ax.legend(handles=handles, loc="best", fontsize=8)
+        handles = [Line2D([0], [0], marker="^", color="w", markerfacecolor="crimson",
+                          markersize=8, label="SA (reference)")]
+        ax.legend(handles=handles, loc="best", fontsize=8)
 
     out_path = os.path.join(base_dir, "results", f"time_to_best_vs_gap_{name}_maxiters_sweep.png")
     fig.savefig(out_path, dpi=150, bbox_inches="tight")
