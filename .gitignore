@@ -1,4 +1,8 @@
 __pycache__/
 *.pyc
 .vscode/
-report/
+report/*.aux
+report/*.log
+report/*.out
+report/*.bbl
+report/*.gz

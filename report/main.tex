@@ -1,0 +1,294 @@
+\documentclass[slovenian, 10pt, titlepage, a4paper]{article}
+\usepackage[top=3cm, bottom=3cm, left = 2cm, right = 2cm]{geometry} 
+\geometry{a4paper} 
+\usepackage[provide=*]{babel}
+\usepackage{algpseudocodex}
+\usepackage{booktabs}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{subcaption}
+\usepackage{longtable}
+
+\bibliographystyle{plain}
+
+\begin{document}
+\begin{titlepage}
+{\centering
+
+\vspace{5cm}
+{\huge\textbf{Reševanje Maximum stable set problema z prilagojenim Petford Welsh algoritmom}}
+
+\vspace{2cm}
+{Sergej Pelko}\\
+{\small{pelko.sergej@gmail.com}}\\
+\vspace{0.5cm}
+{Novo mesto, September 2026}\\
+\vspace{0.5cm}
+}
+\end{titlepage}
+
+\section{Uvod}
+V tem poročilu bom predstavil algoritem z reševanje Maximum stable set problema(MSSP) z uporabo prilagojenega Petford Welsh algoritma(PW).
+
+
+\section{Naloga in algoritem}
+    \textbf{Maximum stable set problem.}
+    Vzemimo graf $G = (V, E)$ z množico vozlišč $V = \{v_1, v_2, \ldots, v_n\}$, stabilna množica $S \subseteq V$ je podmnožica vozlišč, za katero velja, da za vsaki dve vozlišči $v_i, v_j \in S$ ne obstaja povezava $(v_i, v_j) \in E$.
+    Iščemo takšno stabilno množico $S$, ki je največja po velikosti.\\
+    Množico $S$ lahko predstavimo z vektorjem $x \in \{0, 1\}^n$, za katerega velja $x_i = 1$, če in samo če je vozlišče $v_i \in S$.\\
+    MSSP lahko formuliramo kot:
+    $$ \alpha(G) = \max \left\{ e^T x\ |\ x \in \{0, 1\}^n,\ x_i x_j = 0,\ \forall (v_i, v_j) \in E \right\} $$
+    Hamiltonijan za tak problem je:
+    $$ H = -A \sum_{v_i \in V} x_i + B \sum_{(v_i, v_j) \in E} x_i x_j $$
+    Prvi člen maksimizira velikost stabilne množice, drugi člen pa kaznuje vse pare vozlišč, ki se nahajajo v stabilni množici in so povezani s povezavo.\\
+    \textbf{Algoritem.}
+    Algoritem, ki ga bomo uporabili za reševanje MSSP je prilagojena verzija Petford Welsh algoritma(PW).
+
+\begin{algorithmic}[1]
+\selectlanguage{slovenian}
+\Require Graf $G = (V,E)$; nagrado $A$, kazen $B$ (kjer $B > A$); baza $b$; število iteracij $max\_iters$
+
+\State $x_v \gets 0 \ \forall v \in V$ \Comment{Začnemo z prazno množico}
+\State $S^\star \gets \emptyset$; \ $\mathrm{best} \gets 0$
+\For{$t = 1 \to max\_iters$}
+    \State Izberemo naključno vozlišče $u \in V$
+    \State $X_{u,1} \gets B \sum_{v \in N(u)} x_v - A$
+    \State $X_{u,0} \gets 0$
+    \State Spremenimo stanje $x_u$ z verjetnostjo $p_{i} \propto b^{-X_{u,i}}$
+    \If{$x$ je stabilna množica in $\sum_{v \in V} x_v > \mathrm{best}$}
+        \State $S^\star \gets \{v \in V : x_v = 1\}$; \ $\mathrm{best} \gets \sum_{v \in V} x_v$
+    \EndIf
+\EndFor
+\State \Return $S^\star$
+\end{algorithmic}
+
+
+\newpage
+\section{Rezultati}
+    \subsection{Instance}
+    Za testiranje algoritma sem izbral nehaj različnih setov instanc, ki so lepo povzeti v članku \cite{Marino_2026}.
+    Vsak komplet instanc ima svoje značilnosti, a vse so zasnovane tako, da je težko najti optimalno rešitev.
+    \begin{itemize}
+        \item \textbf{DIMACS} - 38 grafov iz izziva DIMACS \cite{dimacs1996}, ki so uporabljeni v članku \cite{Krpan_2025}.
+        \item \textbf{BHOSLIB} - 37 grafov s skritimi optimalnimi rešitvami \cite{bhoslib}.
+        \item \textbf{EVIL} - 41 majhnh grafov z namerno skritimi optimalnimi rešitvami v naključnih grafih iz članka \cite{szabo2019evil}, naloženi iz \cite{evil2repo}.
+        \item \textbf{Coding theory} -  33 grafov iz članka \cite{sloane2000challenge}, za katere ne vemo optimalne rešitve.
+        \item \textbf{PACE} - 96 grafov iz PACE 2019 izziva \cite{pace2019}. Vzeti so bili izzivi iz setov DIMACS, BHOSLIB,... Vsi imajo znano optimalno rešitev. \cite{pace2019instances}
+        \item \textbf{Quantum} 62 instanc z največ 128 vozlišči, ki so zgrajene tako, da je energijska reža med osnovnim in prvim vzbujenim stanjem majhna, kar pomeni, da je težko najti optimalno rešitev s kvantnim računalnikom. \cite{qbenchmarks}
+    \end{itemize}
+    Najprej sem se osredotočil na DIMACS set in so rezultati do poglavja \ref{sec:solver} prikazani le za te instance, kasneje pa sem algoritem preizkusil še na ostalih setih instanc.
+    \subsection{Konstantni parametri}
+    Učinkovitost algoritma je zelo odvisna od izbire parametrov $A$, $B$ in $b$.
+    Zaradi preceješnje različnosti instanc, ne moremo najti vrednosti parametrov, ki bi bile optimalne za vse primere, lahko pa se približno omejimo na nek interval vrednosti, kjer algoritem najde dobre rezultate.
+    V nekaterih primerih so rešitve precej lahke za najti, in lahko uporabimo večjo bazo, kar vodi do manj naključnih odločitev in hitrejšega plezanja k optimalni rešitvi, medtem ko je v drugih primerih potrebno preiskati večji del prostora in je zato potrebna manjša baza.\\
+    Najprej poglejmo, kakšne rezultate dobimo, za fiksne vrednosti parametrov $A$, $B$ in $b$.
+    Vzel sem par testnih instanc za katere vem, da algoritem ponavadi ne najde optimalne rešitve in za vsako sem ponovil $100$ ponovitev z različnimi vrednostmi parametrov $B/A$ in $b$.
+    Slika \ref{fig:results_base} prikazuje rezultate v odvisnosti od baze $b$ pri fiksnih vrednostih $A = 1.0$ in $B = 2.0$, vidimo lahko, da ima baza zelo velik vpliv na rezultate.
+    Za majhne baze je sistem preveč kaotičen in ne najde optimalne rešitve, za previsoke baze pa sistem preišče premajhen del prostora in se zatakne v lokalnem optimumu.
+    To je lepo prikazano na primeru \ref{fig:results_sanr200-0-7}, kjer algoritem najde optimalno rešitev le pri vmesnih vrednostih baze.\\
+    Razmerje $B/A$ ima podoben vpliv, kot lahko vidimo na sliki \ref{fig:results_ratio}, kjer sem fiksiral bazo $b = 8$ in spreminjal razmerje $B/A$.
+    Tu pri vrednostih razmerja nad $4.0$ skoraj ni razlik.
+    Vzemimo, bazo $b = 8$ in razmerje $B/A = 4.0$.
+    V tem primeru je verjetnost da prazno vozlišče sprejmemo v stabilno množico $\approx 0.889$, medtem ko je verjetnost da vozlišče, ki je povezano z vsaj enim vozliščem v stabilni množici sprejmemo $\approx 0.001$, medtem ko je verjetnos za vozlišče z dvema povezavama praktično $0$.
+    To pomeni, da algoritem sprejema le nova vozlišča in dobimo neke vrste naključni greedy algoritem.\\
+    Slika \ref{fig:results_heatmap} prikazuje rezultate v odvisnosti od baze $b$ in razmerja $B/A$, kjer je z barvo označena povprečna velikost stabilne množice, ki jo algoritem najde.
+    Vidimo, da so najboljši rezultati doseženi v območju, kjer nobeden od parametrov ni premajhen ali prevelik.
+    Če nevemo nič o instanci in moramo uporabiti eno vrednost parametrov je najbolj optimalna izbira $A = 1.0$, $B = 2.0$ in $b = 8$.
+    \begin{figure}[H]
+        \centering
+        \begin{subfigure}{0.75\textwidth}
+            \includegraphics[width=\textwidth]{../results/boxplot_brock800_4_base.png}
+            \caption{brock800\_4}
+        \end{subfigure}
+        \begin{subfigure}{0.75\textwidth}
+            \includegraphics[width=\textwidth]{../results/boxplot_san200-0-7-1_base.png}
+            \caption{san200-0-7-1}
+        \end{subfigure}
+        \begin{subfigure}{0.75\textwidth}
+            \includegraphics[width=\textwidth]{../results/boxplot_p_hat1500_3_base.png}
+            \caption{p\_hat1500\_3}
+        \end{subfigure}
+        \begin{subfigure}{0.75\textwidth}
+            \includegraphics[width=\textwidth]{../results/boxplot_sanr200-0-7_base.png}
+            \caption{sanr200-0-7}
+            \label{fig:results_sanr200-0-7}
+        \end{subfigure}
+        \caption{Rezultati v odvisnosti od baze $b$ pri fiksnih vrednostih $A = 1.0$ in $B = 2.0$.}
+        \label{fig:results_base}
+    \end{figure}
+    \begin{figure}[H]
+        \centering
+        \begin{subfigure}{0.45\textwidth}
+            \includegraphics[width=\textwidth]{../results/boxplot_brock800_4_ratio.png}
+            \caption{brock800\_4}
+        \end{subfigure}
+        \begin{subfigure}{0.45\textwidth}
+            \includegraphics[width=\textwidth]{../results/boxplot_san200-0-7-1_ratio.png}
+            \caption{san200-0-7-1}
+        \end{subfigure}
+        \begin{subfigure}{0.45\textwidth}
+            \includegraphics[width=\textwidth]{../results/boxplot_p_hat1500_3_ratio.png}
+            \caption{p\_hat1500\_3}
+        \end{subfigure}
+        \begin{subfigure}{0.45\textwidth}
+            \includegraphics[width=\textwidth]{../results/boxplot_sanr200-0-7_ratio.png}
+            \caption{sanr200-0-7-1}
+        \end{subfigure}
+        \caption{Rezultati v odvisnosti od razmerja $B/A$ pri fiksni vrednosti baze $b = 4$.}
+        \label{fig:results_ratio}
+    \end{figure}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.8\textwidth]{../results/param_sweep_gap_heatmap.png}
+        \caption{Rezultati v odvisnosti od baze $b$ in razmerja $B/A$.}
+        \label{fig:results_heatmap}
+    \end{figure}
+    Nato sem s temi parametri izvedel algoritem na vseh instancah iz DIMACS seta, rezultati pa so prikazani v tabeli \ref{tab:results}.
+    Takšen algoritem, brez kakršnihkoli prilagoditev najde optimalno rešitev za $30$ od $38$ instanc.
+    Stolpci si sledijo po naslednjem vrstnem redu: ime instance, število vozlišč, število povezav, število iteracij, število ponovitev, najboljša najdena stabilna množica, povprečna velikost stabilne množice, čas izvajanja v sekundah, najboljša znana stabilna množica, razlika med najboljšo najdeno in najboljšo znano stabilno množico.
+    \begin{table}[H]
+        \centering
+        \resizebox{\columnwidth}{!}{%
+        \input{benchmark_stable_set_table.tex}
+        }
+        \caption{Rezultati izvajanja algoritma na testnih instancah. Za vse primere so bili uporabljeni parametri $A = 1.0$, $B = 2.0$, baza $b = 8$. Število ponovitev in število iteracij pa sta bili konstantni.}
+        \label{tab:results}
+    \end{table}
+
+    \subsection{Čas izvajanja in optimalnost rezultatov}
+    Število iteracij in ponovitev v prejšnji tabeli je bilo izbrano precej arbitrarno.
+    Ker je to glavni faktor kako dobro rešitev bo algoritem našel bom v nadaljevanju preveril vpliv tega.
+    Slika \ref{fig:results_time_to_best_vs_gap} prikazuje optimalnost rešitve v odvisnosti od časa izvajanja ene ponovitve algoritma, barva pa prikazuje število iteracij.
+    Izbral sem nekaj različnih vrednosti parametra $max\_iters$ in za vsako izvedel $20$ ponovitev algoritma, rezultati za vsako število iteracij so prikazani z boxplotom.\\
+    \begin{figure}[H]
+        \centering
+        \begin{subfigure}{0.45\textwidth}
+            \includegraphics[width=\textwidth]{../results/time_to_best_vs_gap_brock800_4_maxiters_sweep.png}
+            \caption{brock800\_4}
+        \end{subfigure}
+        \begin{subfigure}{0.45\textwidth}
+            \includegraphics[width=\textwidth]{../results/time_to_best_vs_gap_c-fat500-5_maxiters_sweep.png}
+            \caption{c-fat500-5}
+        \end{subfigure}
+        \begin{subfigure}{0.45\textwidth}
+            \includegraphics[width=\textwidth]{../results/time_to_best_vs_gap_p_hat1500_3_maxiters_sweep.png}
+            \caption{p\_hat1500\_3}
+        \end{subfigure}
+        \begin{subfigure}{0.45\textwidth}
+            \includegraphics[width=\textwidth]{../results/time_to_best_vs_gap_san200-0-7-1_maxiters_sweep.png}
+            \caption{san200-0-7-1}
+        \end{subfigure}
+        \caption{Optimalnost rešitve v odvisnosti od časa izvajanja ene ponovitve algoritma, barva pa prikazuje število iteracij.}
+        \label{fig:results_time_to_best_vs_gap}
+    \end{figure}
+
+    \subsection{Začetek na greedy rešitvi}
+    Algoritem zmeraj začne z prazno stabilno množico in potem postopoma dodaja vozlišča.
+    Hitrost bi lahko izboljšali, če začnemo z že obstoječo stabilno množico, ki je morda blizu optimalne rešitve.
+    Zato sem dodal možnost, da algoritem najprej izvede greedy algoritem, ki najde neko stabilno množico in potem začne z algoritmom.
+    Začnemo torej z prazno množico in najprej naključno dodajamo vozlišča, ki niso povezana s povezavo z že izbrano množico, dokler ne pridemo do neke stabilne množice, ki jo potem uporabimo kot začetno stanje algoritma.
+    Primerjavo med začetkom z greedy rešitvijo in začetkom z prazno množico prikazuje spodnja slika \ref{fig:greedy_start_compare}, kjer je prikazana enaka stvar, kot na prejšnjih slikah, le da je sedaj z barvo označen način začetka algoritma.
+    Modra barva označuje začetek z prazno množico, oranžna pa označuje začetek z greedy rešitvijo.
+    Vidimo, da takšen postopek ne izboljša najdene rešitve, edina razlika je, da začetni korak traja dlje časa, zato so rešitve za majhen čas izvajanja slabše, kot če bi začeli z prazno množico.
+    Tu je največji faktor to, da je koda za inicializacijo slabše optimizirana.
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.5\textwidth]{../results/greedy_start_compare_brock800_4.png}
+        \caption{Optimalnost rešitve v odvisnosti od časa izvajanja ene ponovitve algoritma, barva pa prikazuje način začetka algoritma.}
+        \label{fig:greedy_start_compare}
+    \end{figure}
+    
+    \subsection{Primerjava najboljšega stanja z končnim}
+    Algoritem si tekom poteka shranjuje najboljšo rešitev, ki jo je našel.
+    Opcija, ki jo lahko dodamo, je da namesto najboljše rešitve, vzamemo končno stanje, ki ga algoritem najde.
+    Ta množica ponavadi sploh ni stabilna, ampak je lahko blizu optimalne rešitve, ki jo lahko popravimo tako, da postopoma odstranjujemo vozlišča, ki so povezana s povezavo.
+    Primerjavo teh dveh postopkov prikazuje spodnja tabela \ref{tab:results_last_state}, kjer lahko vidimo, da je končno stanje zmeraj slabše od najboljše najdene stabilne množice, zato bom še naprej uporabljal prvotno verzijo algoritma.
+    \begin{table}[H]
+        \centering
+        \resizebox{\columnwidth}{!}{%
+        \input{test_last_state.tex}
+        }
+        \caption{Primerjava med najboljšo najdeno stabilno množico in končnim stanjem algoritma. Za vse primere so bili uporabljeni parametri $A = 1.0$, $B = 2.0$, baza $b = 8$. Končnica $\_best$ označuje najboljšo najdeno stabilno množico, končnica $\_repaired$ pa označuje stabilno množico, ki je bila popravljena iz končnega stanja algoritma.}
+        \label{tab:results_last_state}
+    \end{table}
+    \subsection{Ugibanje optimalne rešitve}
+    Za poljubno podmnožico lahko izračunamo približno optimalno rešitev, ki jo lahko algoritem najde.
+    Če tej podmnožici odštejemo vozlišča, ki so povezana s povezavo, dobimo stabilno množico, ki jo lahko uporabimo za približek optimalne rešitve (ugib $=$ velikost stanja $-$ število povezav v stanju).
+    Algoritmu torej dodamo parameter, ki sledi stanju, ki da najboljšo oceno.
+    Če je ta ocena boljša od najboljše najdene stabilne množice, potem temu stanju postopoma odstranjujemo vozlišča, dokler ne dobimo stabilne množice, ki jo lahko uporabimo kot najboljšo rešitev.
+    Razlika med tema postopkoma je prikazana v spodnji tabeli \ref{tab:results_guess}, kjer lahko vidimo, da ocena nikoli ne izboljša najboljše najdene stabilne množice, zato bom ostal pri prvotni verziji algoritma.
+    Tu je prostor za izboljšavo, če bi začeli z naključno rešitvijo, kjer je možnost za najdenje boljše ocene večja.
+    \begin{table}[H]
+        \centering
+        \resizebox{\columnwidth}{!}{%
+        \input{test_guess.tex}
+        }
+        \caption{Primerjava med najboljšo najdeno stabilno množico in najboljšo oceno, ki jo je algoritem našel. Za vse primere so bili uporabljeni parametri $A = 1.0$, $B = 2.0$, baza $b = 8$.}
+        \label{tab:results_guess}
+    \end{table}
+
+    \subsection{Spreminjanje baze}
+    Zaradi precejšnje različnosti instanc, ponavadi ni mogoče najti optimalne baze in razmerja $B/A$ za vse primere.
+    V nekaterih primerih je fazni prostor precej manj kaotičen in lahko rešitev zelo hitro najdemo z visoko bazo, medtem ko je drugje potrebno preiskati večji del prostora in je zato potrebna manjša baza.
+    Rezultate lahko izboljšamo, tako da med izvajanjem algoritma spreminjamo bazo.
+    Tu sem si izbral dve različni strategiji, ena je preprosto linearno spreminjanje baze od začetne do končne vrednosti, drugo pa je geometrijsko spreminjanje.
+    V obeh primerih lahko strategijo popolnoma parametriziramo z začetno in končno vrednostjo baze.
+    Spodnja slika \ref{fig:variable_base} kaže povprečno odstopanje od optimalne rešitve v odvisnosti od časa izvajanja algoritma na eni izmed instanc, kjer je z barvo označena strategija spreminjanja baze, v legendi pa sta navedeni začetna in končna vrednost baze.
+    Opazimo, da so v vseh primerih rešitve zelo podobne in da je odstopanje v merah napake.\\
+    Da niso vsi rezultati osnovani na eni specifični instanci, sem ponovil meritve še na vseh preostalih instancah in relativno odstopanje od optimalne rešitve povprečil.
+    To sem ponovil za cel razpon začetnih in končnih vrednosti baze.
+    Spodnja slika \ref{fig:variable_base_all} prikazuje točno to, kjer barva prikazuje optimalnost rešitve, ki jo algoritem najde.
+    Opazimo, da geometrijsko spreminjanje baze da malenkost boljše rezultate, prav tako pa se boljše obnesejo urniki z toplejšimi štartom in hladnejšim koncem, kot obratno.
+    Razlike med strategijami pa so skoraj zanemarljive in lahko dobimo zelo dobre rezultate kar z fiksno bazo.
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.5\textwidth]{../results/schedule_budget_sweep_brock800_4.png}
+        \caption{Povprečno odstopanje od optimalne rešitve za različne strategije spreminjanja baze.}
+        \label{fig:variable_base}
+    \end{figure}
+    \begin{figure}[H]
+        \includegraphics[width=\textwidth]{../results/schedule_sweep_all_instances_geometric-linear.png}
+        \caption{Relativno odstopanje od optimalne rešitve v odvisnosti od začetne in končne vrednosti baze. Rdeči kvadrati označujejo fiksno bazo.}
+        \label{fig:variable_base_all}
+    \end{figure}
+
+    \subsection{Spreminjanje razmerja $B/A$}
+    Podobno stvar lahko ponovimo tudi za razmerje $B/A$.
+    Ideja je, da bi začeli z večjim razmerjem $B/A$, da bi na začetku, ko imamo precej prazno množico, hitreje dodajali vozlišča, potem pa bi razmerje $B/A$ znižali, da bi prioritizirali stabilnost množice.
+    Spodnja slika \ref{fig:variable_ratio} kaže relativno povprečno odstopanje od optimalne rešitve za različne strategije spreminjanja razmerja $B/A$.
+    Razlike med tem in fiksnim razmerjem skoraj ni, najboljše vrednosti pa so dosežene pri razmerju $1.5 - 2$.
+
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=\textwidth]{../results/ratio_schedule_sweep_all_instances_geometric-linear.png}
+        \caption{Relativno odstopanje od optimalne rešitve v odvisnosti od začetne in končne vrednosti razmerja $B/A$. Rdeči kvadrati označujejo fiksno razmerje $B/A$.}
+        \label{fig:variable_ratio}
+    \end{figure}
+
+
+    \section{Solver}
+    \label{sec:solver}
+    Očitno spreminjanje baze in razmerja $B/A$ tekom izvajanja ene ponovitve algoritma ne prinese boljših rezultatov, kot če bi uporabili fiksne vrednosti.
+    Hkrati pa ne obstajajo optimalne vrednosti parametrov, ki bi bile dobre za vse primere.
+    Zato sem se odločil, da namesto tega, da za vse ponovitve algoritma uporabim iste parametre, bom za vsako ponovitev izbral druge vrednosti.
+    Za bazo sem uzel vrednosti $b \in \{1.5, 2.0, 3.0, 5.0, 8.0, 10.0, 15.0, 20.0, 30.0, 50.0\}$, za razmerje $B/A$ pa vrednosti $r \in \{1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5\}$.
+    Nato naredim kartezičnni produkt teh dveh množic in za vsako ponovitev po vrsti izberem en par parametrov. \\
+    Namesto točne izbire števila iteracij, sem algoritem za vsako instanco izvajal po $1$ sekundo, kar je za vsako prišlo različno število iteracij.
+    Tabela \ref{tab:results_solver} prikazuje rezultate izvajanja algoritma na vseh testnih instancah.
+    \input{run_instance_cli_table.tex}
+
+    \section{Zaključek}
+    Algoritem je precej hiter in da dobre rezultate.
+    Zaenkrat večina predlaganih izboljšav ni prineslo boljših rezultatov, ampak bi se dalo še marsikaj poskusiti.
+    V prihodnje bi lahko izboljšali algoritem za začetno stanje, da bi morda izboljšali rezultate, prav tako bi lahko dodali še kakšen postprocesing.
+    Lahko bi tudi poskusil dodati boljšo oceno optimalne rešitve, kot le velikost trenutne množice minus število povezav v njej.
+    Zaenkrat sem ločeno preizkušal spreminjanje baze in razmerja $B/A$, v prihodnje pa bi lahko poskusil tudi kombinirati oba postopka in videti, če bi to prineslo boljše rezultate.
+    Razlika med tem in originalnim PW algoritmom je, da originalni ne izbere naključnega vozlišča, ampak izbere naključno slabo vozlišče.
+    Morda bi lahko začeli z polno množico in na ta način odstranjevali vozlišča, dokler ne pridemo do stabilne rešitve.
+    Prav tako bi lahko namesto naključnega izbora vozlišča, izbrali vozlišča po vrsti in tako zagotovili, da algoritem preišče cel graf enakomerno.
+
+    \bibliography{refs}
+
+
+\end{document}
