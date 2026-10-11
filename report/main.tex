@@ -70,12 +70,12 @@ V tem poročilu bom predstavil algoritem z reševanje Maximum stable set problem
     Za testiranje algoritma sem izbral nehaj različnih setov instanc, ki so lepo povzeti v članku \cite{Marino_2026}.
     Vsak komplet instanc ima svoje značilnosti, a vse so zasnovane tako, da je težko najti optimalno rešitev.
     \begin{itemize}
-        \item \textbf{DIMACS} - 38 grafov iz izziva DIMACS \cite{dimacs1996}, ki so uporabljeni v članku \cite{Krpan_2025}.
-        \item \textbf{BHOSLIB} - 37 grafov s skritimi optimalnimi rešitvami \cite{bhoslib}.
-        \item \textbf{EVIL} - 41 majhnh grafov z namerno skritimi optimalnimi rešitvami v naključnih grafih iz članka \cite{szabo2019evil}, naloženi iz \cite{evil2repo}.
-        \item \textbf{Coding theory} -  33 grafov iz članka \cite{sloane2000challenge}, za katere ne vemo optimalne rešitve.
-        \item \textbf{PACE} - 96 grafov iz PACE 2019 izziva \cite{pace2019}. Vzeti so bili izzivi iz setov DIMACS, BHOSLIB,... Vsi imajo znano optimalno rešitev. \cite{pace2019instances}
-        \item \textbf{Quantum} 62 instanc z največ 128 vozlišči, ki so zgrajene tako, da je energijska reža med osnovnim in prvim vzbujenim stanjem majhna, kar pomeni, da je težko najti optimalno rešitev s kvantnim računalnikom. \cite{qbenchmarks}
+        \item \textbf{DIMACS} - 37 grafov iz izziva DIMACS \cite{dimacs1996}, ki so uporabljeni v članku \cite{Krpan_2025}.
+        \item \textbf{BHOSLIB} - 36 grafov s skritimi optimalnimi rešitvami \cite{bhoslib}.
+        \item \textbf{EVIL} - 40 majhnh grafov z namerno skritimi optimalnimi rešitvami v naključnih grafih iz članka \cite{szabo2019evil}, naloženi iz \cite{evil2repo}.
+        \item \textbf{Coding theory} -  32 grafov iz članka \cite{sloane2000challenge}, za katere ne vemo optimalne rešitve.
+        \item \textbf{PACE} - 95 grafov iz PACE 2019 izziva \cite{pace2019}. Vzeti so bili izzivi iz setov DIMACS, BHOSLIB,... Vsi imajo znano optimalno rešitev. \cite{pace2019instances}
+        \item \textbf{Quantum} 61 instanc z največ 128 vozlišči, ki so zgrajene tako, da je energijska reža med osnovnim in prvim vzbujenim stanjem majhna, kar pomeni, da je težko najti optimalno rešitev s kvantnim računalnikom. \cite{qbenchmarks}
     \end{itemize}
     Najprej sem se osredotočil na DIMACS set in so rezultati do poglavja \ref{sec:solver} prikazani le za te instance, kasneje pa sem algoritem preizkusil še na ostalih setih instanc.
     \subsection{Konstantni parametri}
@@ -145,7 +145,7 @@ V tem poročilu bom predstavil algoritem z reševanje Maximum stable set problem
         \label{fig:results_heatmap}
     \end{figure}
     Nato sem s temi parametri izvedel algoritem na vseh instancah iz DIMACS seta, rezultati pa so prikazani v tabeli \ref{tab:results}.
-    Takšen algoritem, brez kakršnihkoli prilagoditev najde optimalno rešitev za $30$ od $38$ instanc.
+    Takšen algoritem, brez kakršnihkoli prilagoditev najde optimalno rešitev za $29$ od $37$ instanc.
     Stolpci si sledijo po naslednjem vrstnem redu: ime instance, število vozlišč, število povezav, število iteracij, število ponovitev, najboljša najdena stabilna množica, povprečna velikost stabilne množice, čas izvajanja v sekundah, najboljša znana stabilna množica, razlika med najboljšo najdeno in najboljšo znano stabilno množico.
     \begin{table}[H]
         \centering
@@ -274,9 +274,20 @@ V tem poročilu bom predstavil algoritem z reševanje Maximum stable set problem
     Zato sem se odločil, da namesto tega, da za vse ponovitve algoritma uporabim iste parametre, bom za vsako ponovitev izbral druge vrednosti.
     Za bazo sem uzel vrednosti $b \in \{1.5, 2.0, 3.0, 5.0, 8.0, 10.0, 15.0, 20.0, 30.0, 50.0\}$, za razmerje $B/A$ pa vrednosti $r \in \{1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5\}$.
     Nato naredim kartezičnni produkt teh dveh množic in za vsako ponovitev po vrsti izberem en par parametrov. \\
-    Namesto točne izbire števila iteracij, sem algoritem za vsako instanco izvajal po $1$ sekundo, kar je za vsako prišlo različno število iteracij.
-    Tabela \ref{tab:results_solver} prikazuje rezultate izvajanja algoritma na vseh testnih instancah.
-    \input{run_instance_cli_table.tex}
+    Število iteracij sem proporiconalno povečal glede na število vozlišč v grafu.
+    Najprej sem za vsako instanco izbral število iteracij $max\_iters = 10 \cdot |V|$, in po končanem izvajanju preveril rešitev.
+    Če je bila rešitev optimalna, sem končal, sicer pa sem povečal število iteracij za faktor $10$ in ponovil postopek, dokler nisem našel optimalne rešitve ali pa presegel čas izvajanja $10$ minut.
+    Za število ponovitev sem izbral $100$.
+    Tabele spodaj prikazuje rezultate izvajanja algoritma na vseh testnih instancah.
+
+    \input{budget_tiers_table.tex}
+
+    Tabela spodaj prikazuje povzetke rezultatov za vsak set instanc posebej.
+    Vidimo da sta seta quantum in EVIL precej lahka in algoritem najde optimalno rešitev za vse instance.
+    Največ problema pa ima s seti PACE in bhoslib, kjer je rešitev povprečno slabša za $2-4\%$ od optimalne.
+    Grafi iz seta PACE so precej veliki zato je pri tako majhnem času izvajanja pričakovano, da algoritem ne najde optimalne rešitve.
+
+    \input{budget_tiers_summary_table.tex}
 
     \section{Zaključek}
     Algoritem je precej hiter in da dobre rezultate.

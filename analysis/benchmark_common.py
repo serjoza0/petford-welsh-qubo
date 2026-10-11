@@ -2,6 +2,7 @@ import os
 import sys
 import glob
 import csv
+import re
 from time import perf_counter
 import numpy as np
 
@@ -103,6 +104,28 @@ def run_sa_attempts(nx_graph, num_attempts, beta, sampler):
         best = len(rec["best_recalculated_solution"]["recalculated_solution_nodes"])
         out.append((best, elapsed))
     return out
+
+def _norm_name(s):
+    return re.sub(r"[^a-z0-9]", "", s.lower())
+
+def load_upper_bounds(base_dir=None):
+    """Map project instance name -> upper_bound from instances/mcp_best_known_solutions.csv.
+
+    Rows are matched to project instances by normalized name (lowercase,
+    alphanumerics only). Every matched row's upper_bound is kept, whether or
+    not it equals best_known.
+    """
+    by_norm = {_norm_name(name): name for name in all_instance_names(base_dir)}
+    csv_path = os.path.join(instances_dir(base_dir), "mcp_best_known_solutions.csv")
+    upper_bound = {}
+    with open(csv_path, newline="") as f:
+        for row in csv.DictReader(f):
+            for cand in (row["instance"], os.path.splitext(os.path.basename(row["file"]))[0]):
+                key = _norm_name(cand)
+                if key in by_norm:
+                    upper_bound[by_norm[key]] = int(row["upper_bound"])
+                    break
+    return upper_bound
 
 def write_csv(rows, path):
     if not rows:
